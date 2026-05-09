@@ -64,17 +64,16 @@ if _profile_arg is not None:
     _profiles._active_profile = _profile_arg
 
 # ── API auth state ─────────────────────────────────────────────────────────
-# Mirror the env-var contract used by api/config.py:32-33 so a non-default
-# WebUI port/host (e.g. when 8787 is held by another service on the host)
-# Just Works without configuration drift between the WebUI process and MCP.
-WEBUI_HOST = os.environ.get("HERMES_WEBUI_HOST", "127.0.0.1")
-WEBUI_PORT = os.environ.get("HERMES_WEBUI_PORT", "8787")
+# 讀取透明家園的連線設定，確保通訊塔與伺服器門牌一致
+# 直接調用 api.config 裡的 HOST/PORT，這是最保險的做法
+WEBUI_HOST = os.environ.get("HERMES_WEBUI_HOST", _cfg.HOST)
+WEBUI_PORT = os.environ.get("HERMES_WEBUI_PORT", str(_cfg.PORT))
 WEBUI_URL = f"http://{WEBUI_HOST}:{WEBUI_PORT}"
 _auth_cookie: str | None = None
-_auth_expires: float = 0  # unix timestamp after which we re-auth
+_auth_expires: float = 0 
 
-server = Server("hermes-webui")
-
+# 修改伺服器名稱，讓它在日誌中更顯眼
+server = Server("祇園守護者-通訊塔")
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  Helpers — filesystem (project CRUD via canonical api.models)
@@ -558,10 +557,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 
 async def main():
+    # 啟動時發出信號，讓您在後台知道通訊塔已就緒
+    print(f"[祇園通訊塔] 正在監聽來自 AI 的管理指令... (連線至 {WEBUI_URL})", file=sys.stderr)
     async with stdio_server() as (read, write):
         await server.run(read, write, server.create_initialization_options())
 
-
+# 這是啟動 Python 程式的「點火開關」，務必保留
 if __name__ == "__main__":
     import asyncio
     asyncio.run(main())
