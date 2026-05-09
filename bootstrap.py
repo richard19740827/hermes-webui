@@ -72,7 +72,6 @@ DEFAULT_PORT = int(os.getenv("HERMES_WEBUI_PORT", "8787"))
 def info(msg: str) -> None:
     print(f"[bootstrap] {msg}", flush=True)
 
-
 def is_wsl() -> bool:
     if platform.system() != "Linux":
         return False
@@ -81,6 +80,12 @@ def is_wsl() -> bool:
         "microsoft" in release or "wsl" in release or bool(os.getenv("WSL_DISTRO_NAME"))
     )
 
+def ensure_supported_platform() -> None:
+    if platform.system() == "Windows" and not is_wsl():
+        raise RuntimeError(
+            "Native Windows is not supported for this bootstrap yet. "
+            "Please run it from Linux, macOS, or inside WSL2."
+        )
 
 def ensure_supported_platform() -> None:
     if platform.system() == "Windows" and not is_wsl():
@@ -89,26 +94,8 @@ def ensure_supported_platform() -> None:
             "Please run it from Linux, macOS, or inside WSL2."
         )
 
-
 def _agent_dir_from_hermes_cli() -> Path | None:
-    """Resolve the agent install root by inspecting the `hermes` CLI shebang.
-
-    The Hermes Agent installer drops a `hermes` console-script in the user's
-    PATH whose shebang points at the agent's bundled venv:
-
-        #!/path/to/hermes-agent/venv/bin/python3
-
-    Walking up the parents until we find a directory that contains
-    `run_agent.py` recovers the install root regardless of where the user
-    chose to clone the agent (e.g. ~/Projects/GitHub/hermes-agent), which
-    the hard-coded candidate list in :func:`discover_agent_dir` cannot.
-
-    Last-resort only: this is invoked after every explicit candidate
-    (`HERMES_WEBUI_AGENT_DIR`, `$HERMES_HOME/hermes-agent`, etc.) has missed.
-    A stale clone in a known location still wins over the live `hermes` CLI
-    — that's intentional, since the candidate list is treated as
-    authoritative when present, and matches existing behavior.
-    """
+    """祇園優化版：確保路徑從 .hermes 遷移到 Hermes_Gion_Core 也能準確識別。"""
     hermes_path = shutil.which("hermes")
     if not hermes_path:
         return None
@@ -117,27 +104,36 @@ def _agent_dir_from_hermes_cli() -> Path | None:
             first_line = f.readline().strip()
     except OSError:
         return None
+        
     if not first_line.startswith("#!"):
         return None
+        
     interp_field = first_line[2:].strip().split(None, 1)
     if not interp_field:
         return None
+        
     interp = Path(interp_field[0])
     if not interp.is_absolute():
         return None
+        
+    # 從 Python 直譯器路徑往上找，直到發現 run_agent.py
     for parent in interp.parents:
         if (parent / "run_agent.py").exists():
+            info(f"偵測到大腦安裝於: {parent.resolve()}")
             return parent.resolve()
+            
     return None
 
 
 def discover_agent_dir() -> Path | None:
-    home = Path(os.getenv("HERMES_HOME", str(Path.home() / ".hermes"))).expanduser()
+    # 修正：預設優先看向您的「祇園家園」透明資料夾
+    home = Path(os.getenv("HERMES_HOME", str(Path.home() / "Hermes_Gion_Core"))).expanduser()
     candidates = [
         os.getenv("HERMES_WEBUI_AGENT_DIR", ""),
         str(home / "hermes-agent"),
         str(REPO_ROOT.parent / "hermes-agent"),
-        str(Path.home() / ".hermes" / "hermes-agent"),
+        # 修正：把原本的隱藏路徑改成透明路徑
+        str(Path.home() / "Hermes_Gion_Core" / "hermes-agent"),
         str(Path.home() / "hermes-agent"),
     ]
     for raw in candidates:
