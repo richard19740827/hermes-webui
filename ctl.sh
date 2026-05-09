@@ -2,11 +2,16 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HERMES_HOME="${HERMES_HOME:-${HOME}/.hermes}"
+# 對齊您的透明家園路徑
+HERMES_HOME="${HERMES_HOME:-${HOME}/Hermes_Gion_Core}"
+
+# 將守護程序的紀錄檔放在家園內，不再隱藏
 PID_FILE="${HERMES_WEBUI_PID_FILE:-${HERMES_HOME}/webui.pid}"
 LOG_FILE="${HERMES_WEBUI_LOG_FILE:-${HERMES_HOME}/webui.log}"
 STATE_FILE="${HERMES_WEBUI_CTL_STATE_FILE:-${HERMES_HOME}/webui.ctl.env}"
-DEFAULT_STATE_DIR="${HERMES_WEBUI_STATE_DIR:-${HERMES_HOME}/webui}"
+
+# 確保對齊我們改過的 webui_history
+DEFAULT_STATE_DIR="${HERMES_WEBUI_STATE_DIR:-${HERMES_HOME}/webui_history}"
 
 usage() {
   cat <<'EOF'
