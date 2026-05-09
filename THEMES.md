@@ -1,145 +1,79 @@
-# Hermes Web UI — Themes
+# Hermes Web UI — 主題指南
 
-Hermes Web UI supports pluggable color themes. Seven themes ship built-in, and
-you can create your own with pure CSS — no Python changes needed.
-
----
-
-## Switching Themes
-
-**Settings panel:** Click the gear icon, select a theme from the dropdown. The
-preview is instant — the UI updates as you click through options.
-
-**Slash command:** Type `/theme dark` or `/theme light` in the composer.
-
-**Themes persist** across page reloads and server restarts (stored in
-`settings.json` server-side, with `localStorage` for flicker-free loading).
+Hermes Web UI 支援可插拔的顏色主題。系統內建了七款主題，您也可以直接透過純 CSS 建立自己的主題，完全無需修改 Python 程式碼。
 
 ---
 
-## Built-in Themes
+## 🎨 切換主題
 
-| Theme | Description |
-|-------|-------------|
-| **Dark** (default) | Deep navy/indigo with muted blue accents. Easy on the eyes for long sessions. |
-| **Light** | Warm off-white with dark text. High contrast for bright environments. |
-| **Slate** | Warm charcoal, lighter than Dark. Easier on the eyes for extended use. |
-| **Solarized Dark** | Ethan Schoonover's classic dark palette. Teal background, warm accents. |
-| **Monokai** | Warm dark theme inspired by the Monokai editor scheme. Green/pink accents. |
-| **Nord** | Arctic blue-gray palette from the Nord color system. Calm and minimal. |
-| **OLED** | True black (#000) backgrounds for OLED displays. Minimizes glow and burn-in risk. |
-| **Custom themes** | Any string accepted by `settings.json`, `POST /api/settings`, and `/theme` if added to the picker/command list. Pure CSS variables only. |
+* **設定面板**：點擊齒輪圖示，從下拉選單中選擇主題。預覽是即時的 —— UI 會隨著您的選擇立即更新。
+* **斜線指令**：在對話框輸入 `/theme dark` 或 `/theme light`。
+* **持久化儲存**：主題設定會跨頁面重整與伺服器重啟保持一致（伺服器端儲存於 `settings.json`，瀏覽器端則利用 `localStorage` 達成無閃爍加載）。
 
 ---
 
-## Creating a Custom Theme
+## 🏛️ 內建主題列表
 
-A theme is a CSS block that overrides the color variables. Add it to
-`static/style.css` (or a separate file that you link after the main stylesheet).
+| 主題名稱 | 說明描述 |
+| :--- | :--- |
+| **Dark** (預設) | 深海藍/靛青色背景搭配柔和藍色點綴。長時間使用不傷眼。 |
+| **Light** | 溫暖米白色背景搭配深色文字。適合明亮環境的高對比度配色。 |
+| **Slate** | 暖炭灰色，比 Dark 主題稍亮。適合追求舒適度的長時間使用者。 |
+| **Solarized Dark** | 經典的 Solarized 暗色調。青色底色搭配溫暖強調色。 |
+| **Monokai** | 受 Monokai 編輯器啟發，具有招牌的綠色與粉色點綴。 |
+| **Nord** | 來自 Nord 色彩系統的北極藍灰色調。冷靜、簡潔且極簡。 |
+| **OLED** | 為 OLED 螢幕設計的純黑 (#000) 背景。降低發光並防止燒屏。 |
 
-### Step 1: Define your theme block
+---
 
-Every color in the UI comes from these CSS variables:
+## 🛠️ 建立自定義主題
+
+主題本質上是一段覆蓋顏色變數的 CSS 區塊。請將其加入到 `static/style.css` 中（或另外連結一個 CSS 檔案）。
+
+### 第一步：定義主題區塊
+
+UI 中的每一種顏色都由以下這些 CSS 變數控制：
 
 ```css
-:root[data-theme="your-theme-name"] {
-  /* Core palette */
-  --bg: #1a1a2e;          /* Main background */
-  --sidebar: #16213e;      /* Sidebar background */
-  --border: rgba(255,255,255,0.08);   /* Subtle borders */
-  --border2: rgba(255,255,255,0.14);  /* Stronger borders */
-  --text: #e8e8f0;         /* Primary text color */
-  --muted: #8888aa;        /* Secondary/muted text */
-  --accent: #e94560;       /* Accent color (errors, warnings, delete) */
-  --blue: #7cb9ff;         /* Primary action color (links, active states) */
-  --gold: #c9a84c;         /* Secondary accent (pinned items, gold highlights) */
-  --code-bg: #0d1117;      /* Code block background */
+:root[data-theme="您的主題名稱"] {
+  /* 核心調色盤 (Core Palette) */
+  --bg: #1a1a2e;          /* 主背景 */
+  --sidebar: #16213e;      /* 側邊欄背景 */
+  --border: rgba(255,255,255,0.08);   /* 微弱邊框 */
+  --text: #e8e8f0;         /* 主要文字顏色 */
+  --accent: #e94560;       /* 強調色 (錯誤、警告、刪除按鈕) */
+  --blue: #7cb9ff;         /* 主要動作顏色 (連結、選中狀態) */
+  --gold: #c9a84c;         /* 次要強調色 (置頂項目、金色高亮) */
+  --code-bg: #0d1117;      /* 程式碼區塊背景 */
 
-  /* Surface and chrome (required for full theme polish) */
-  --surface: #1a2535;      /* Dropdowns, popups, toast, approval card */
-  --topbar-bg: rgba(22,33,62,.98);   /* Topbar background */
-  --main-bg: rgba(26,26,46,0.5);    /* Main chat area background */
-  --input-bg: rgba(255,255,255,.04); /* Input/button subtle backgrounds */
-  --hover-bg: rgba(255,255,255,.06); /* Hover state backgrounds */
-  --focus-ring: rgba(124,185,255,.35); /* Focus border color */
-  --focus-glow: rgba(124,185,255,.08); /* Focus box-shadow glow */
-
-  /* Typography (required for readable text across themes) */
-  --strong: #fff;          /* Bold text in messages */
-  --em: #c9c9e8;           /* Italic text in messages */
-  --code-text: #f0c27f;    /* Inline code text color */
-  --code-inline-bg: rgba(0,0,0,.35); /* Inline code background */
-  --pre-text: #e2e8f0;     /* Code block text color */
+  /* 表面與細節 (Surface and Chrome) */
+  --surface: #1a2535;      /* 下拉選單、彈窗、提示框背景 */
+  --topbar-bg: rgba(22,33,62,.98);   /* 頂部欄背景 */
+  --main-bg: rgba(26,26,46,0.5);    /* 聊天主區域背景 */
+  --input-bg: rgba(255,255,255,.04); /* 輸入框/按鈕的微弱背景 */
+  --hover-bg: rgba(255,255,255,.06); /* 懸停狀態背景 */
 }
-```
 
-The **core palette** controls the overall mood. The **surface/chrome** and
-**typography** variables are part of the standard theme contract — define all
-of them for a complete theme.
+第二步：加入主題選擇器（可選）
+若要讓您的主題出現在「設定」下拉選單中，請在 static/index.html 的主題 <select> 區塊中新增一行：
 
-For **light themes**, you also need `:root[data-theme="name"]` overrides
-for elements that use `rgba(255,255,255,.XX)` hover/border effects (these
-are invisible on light backgrounds). See the built-in light theme for the
-full pattern — it overrides ~45 selectors for proper dark-on-light contrast
-on hover states, borders, chips, role labels, session items, and
-interactive elements.
+<option value="your-theme-name">您的主題名稱</option>
 
-### Step 2: Add it to the theme picker (optional)
-
-To make your theme appear in the Settings dropdown, add an `<option>` to the
-theme `<select>` in `static/index.html`:
-
-```html
-<option value="your-theme-name">Your Theme Name</option>
-```
-
-And update the `/theme` command's valid theme list in `static/commands.js`.
-
-### Step 3: Test it
-
-Switch to your theme via `/theme your-theme-name` or the Settings panel.
-Check these areas:
-- Sidebar session list (hover states, active state, project borders)
-- Message bubbles (user vs assistant styling)
-- Code blocks (background contrast, copy button visibility)
-- Tool cards (running indicator, expand/collapse)
-- Settings panel and login page
-- Mobile layout (hamburger sidebar, bottom nav)
-
-### Tips
-
-- **Light themes** need scrollbar and selection overrides, plus the full
-  text/code set (`--strong`, `--em`, `--code-text`, `--code-inline-bg`,
-  `--pre-text`) or they will look broken.
-- The **logo gradient** uses `--accent` automatically, so it adapts to your
-  theme without extra work.
-- **Prism.js syntax highlighting** uses its own CDN stylesheet (Tomorrow theme).
-  It works well on dark themes; on light themes the contrast is acceptable but
-  not perfect. Custom Prism theme support is planned for a future update.
-- **No server changes needed.** The `theme` setting in `settings.json` accepts
-  any string — your custom theme name will persist without code changes.
-
----
-
-## How Themes Work Internally
-
-1. Each theme is a `:root[data-theme="name"]` CSS block that overrides variables.
-2. Switching themes sets `document.documentElement.dataset.theme = name` in JS.
-3. A tiny inline `<script>` in `<head>` reads `localStorage` before the
-   stylesheet loads — this prevents a flash of the wrong theme on page load.
-4. The theme preference is saved server-side via `POST /api/settings` and
-   loaded on boot via `GET /api/settings`.
-5. The `/theme` command and Settings dropdown both update the DOM, localStorage,
-   and server settings simultaneously.
-
----
-
-## Contributing a Theme
-
-To contribute a new built-in theme:
-
-1. Add your `:root[data-theme="name"]` block to `static/style.css`
-2. Add the `<option>` to the Settings panel in `static/index.html`
-3. Add the theme name to the valid list in `cmdTheme()` in `static/commands.js`
-4. Test on desktop and mobile
-5. Open a PR — themes are pure CSS additions with no backend changes needed
+隨後同步更新 static/commands.js 中 /theme 指令的有效清單。
+第三步：測試
+切換至您的主題後，請檢查以下區域：
+•	側邊欄：會話列表的懸停與選中狀態。
+•	對話氣泡：使用者與助手的樣式區分。
+•	程式碼塊：背景對比度與複製按鈕的可見性。
+•	行動裝置：側邊選單與底部導航欄。
+⚙️ 運作原理
+	1.	CSS 驅動：每個主題都是一個透過 :root[data-theme="name"] 覆蓋變數的 CSS 區塊。
+	2.	JS 切換：切換主題時，JS 會修改 document.documentElement.dataset.theme。
+	3.	防閃爍：<head> 內建微型腳本會在 CSS 加載前讀取 localStorage。
+	4.	同步儲存：主題偏好會同時存回伺服器端與本地瀏覽器。
+🤝 貢獻主題
+若要貢獻新的內建主題：
+	1.	將您的 CSS 區塊新增至 static/style.css。
+	2.	在 static/index.html 的設定面板中新增 <option>。
+	3.	在 static/commands.js 的 cmdTheme() 清單中加入主題名稱。
+	4.	在桌面版與行動版完成測試後開啟 PR。
