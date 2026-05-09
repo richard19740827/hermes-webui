@@ -1,13 +1,13 @@
 # Hermes WebUI — single-container Docker Compose
-#
+
 # QUICK START (most users):
 #   1. (Optional) Copy .env.docker.example to .env and edit values
 #   2. docker compose up -d
 #   3. Open http://localhost:8787
-#
+
 # This is the simplest setup: one WebUI container that runs the agent in-process.
 # The WebUI auto-detects host UID/GID from the mounted .hermes volume.
-#
+
 # For multi-container setups (separate agent + webui or agent+webui+dashboard),
 # see docker-compose.two-container.yml or docker-compose.three-container.yml.
 
@@ -47,7 +47,7 @@ services:
       - HERMES_WEBUI_DEFAULT_WORKSPACE=/workspace
       # Optional: set a password for remote access
        - HERMES_WEBUI_PASSWORD=your-secret-password
-      #
+      
       # Bind-mount permission handling (fixes #1389, #1399):
       #   When you mount an EXISTING ~/.hermes directory (the common case),
       #   the WebUI's startup credential-permission fixer can clash with
