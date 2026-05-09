@@ -1,17 +1,15 @@
-# Hermes Web UI
+# 祇園守護者介面 (Hermes WebUI)
 
-[Hermes Agent](https://hermes-agent.nousresearch.com/) is a sophisticated autonomous agent that lives on your server, accessed via a terminal or messaging apps, that remembers what it learns and gets more capable the longer it runs.
+[Hermes 代理人](https://hermes-agent.nousresearch.com/) 是一個住在您設備中的聰明自主助手。它透過終端機或通訊軟體與您連結，它會記住學習到的內容，並且運行得越久，能力就越強。
 
-Hermes WebUI is a lightweight, dark-themed web app interface in your browser for [Hermes Agent](https://hermes-agent.nousresearch.com/).
-Full parity with the CLI experience - everything you can do from a terminal,
-you can do from this UI. No build step, no framework, no bundler. Just Python
-and vanilla JS.
+這套 WebUI 是為該代理人設計的輕量級、深色主題網頁介面。
+**功能完全對等** —— 凡是您在技術黑視窗（終端機）能做的事，都能在這個精美的網頁介面上完成。它不需要複雜的安裝步驟，也沒有冗餘的軟體框架。它是純粹的 Python 指令與最原始的網頁技術結晶，這代表它反應迅速且不浪費您的硬體效能。
 
-Layout: three-panel. Left sidebar for sessions and navigation, center for chat,
-right for workspace file browsing. Model, profile, and workspace controls live in
-the **composer footer** — always visible while composing. A circular context ring
-shows token usage at a glance. All settings and session tools are in the
-**Hermes Control Center** (launcher at the sidebar bottom).
+**介面佈局：三欄式設計**
+- **左側欄**：用於對話紀錄管理與導航。
+- **中間區**：主要的對話聊天室。
+- **右側欄**：工作區檔案瀏覽，讓您隨時查看 AI 處理的檔案。
+所有的模型切換與工作區控制都在下方的**「輸入框頁尾」**，讓您在打字時一目了然。
 
 <img width="2448" height="1748" alt="Hermes Web UI — three-panel layout" src="https://github.com/user-attachments/assets/6bf8af4c-209d-441e-8b92-6515d7a0c369" />
 
@@ -45,632 +43,219 @@ This gives you nearly **1:1 parity with Hermes CLI from a convenient web UI** wh
 
 ---
 
-## Why Hermes
+## 為什麼選擇祇園守護者 (Gion Guardian)
 
-Most AI tools reset every session. They don't know who you are, what you worked on, or what
-conventions your project follows. You re-explain yourself every time.
+大多數人工智慧工具在每次對話結束後都會「重置」。它們不記得您是誰、不記得您處理過的公益專案，也不了解您的工作慣例。導致您每次都要重新解釋、重複教導。
 
-Hermes retains context across sessions, runs scheduled jobs while you're offline, and gets
-smarter about your environment the longer it runs. It uses your existing Hermes agent setup,
-your existing models, and requires no additional configuration to start.
+**祇園守護者（Hermes）** 則完全不同：它會跨會話保留背景資訊。它能在您離線時執行預定任務，且運行的時間越長，它就越熟悉您的環境，變得越聰明。它直接使用您在 M4 上的設定，無需繁瑣配置即可啟動。
 
-What makes it different from other agentic tools:
+###  是什麼讓它與眾不同？
 
-- **Persistent memory** — user profile, agent notes, and a skills system that saves reusable
-  procedures; Hermes learns your environment and does not have to relearn it
-- **Self-hosted scheduling** — cron jobs that fire while you're offline and deliver results to
-  Telegram, Discord, Slack, Signal, email, and more
-- **10+ messaging platforms** — the same agent available in the terminal is reachable from your phone
-- **Self-improving skills** — Hermes writes and saves its own skills automatically from experience;
-  no marketplace to browse, no plugins to install
-- **Provider-agnostic** — OpenAI, Anthropic, Google, DeepSeek, OpenRouter, and more
-- **Orchestrates other agents** — can spawn Claude Code or Codex for heavy coding tasks and bring
-  the results back into its own memory
-- **Self-hosted** — your conversations, your memory, your hardware
+- **持久記憶 (Persistent Memory)**：它擁有使用者配置檔案、代理筆記與技能系統。它會不斷學習您的環境，不需要您重複教導。
+- **自動排程 (Self-hosted Scheduling)**：即使您離線，它也能執行預定的「定時任務」，並將結果傳送到您的手機、電子郵件或通訊軟體。
+- **多平台連結**：同一個 AI 助手，您可以透過電腦終端機、網頁介面，甚至手機隨時聯繫。
+- **自動進化的技能**：它能根據經驗自動編寫並儲存新技能，不需要安裝複雜的外掛。
+- **不分品牌 (Provider-agnostic)**：它能同時支援 OpenAI、Google、Claude、DeepSeek 等各大模型，靈活切換。
+- **指揮其他 AI**：它可以調動更強大的模型（如 Claude Code）來處理繁重的編碼任務，並將結果收回到自己的記憶中。
+- **絕對自主 (Self-hosted)**：您的對話、您的記憶、您的硬體。這就是對您隱私與數據主權的最高承諾。
 
-**vs. the field** *(landscape is actively shifting — see [HERMES.md](HERMES.md) for the full breakdown)*:
+###  同類工具對比
 
-| | OpenClaw | Claude Code | Codex CLI | OpenCode | Hermes |
-|---|---|---|---|---|---|
-| Persistent memory (auto) | Yes | Partial† | Partial | Partial | Yes |
-| Scheduled jobs (self-hosted) | Yes | No‡ | No | No | Yes |
-| Messaging app access | Yes (15+ platforms) | Partial (Telegram/Discord preview) | No | No | Yes (10+) |
-| Web UI (self-hosted) | Dashboard only | No | No | Yes | Yes |
-| Self-improving skills | Partial | No | No | No | Yes |
-| Python / ML ecosystem | No (Node.js) | No | No | No | Yes |
-| Provider-agnostic | Yes | No (Claude only) | Yes | Yes | Yes |
-| Open source | Yes (MIT) | No | Yes | Yes | Yes |
+| 功能特性 | 其他常見 AI | 專業開發工具 | **祇園守護者 (Hermes)** |
+|---|---|---|---|
+| **自動持久記憶** | ❌ 每次重置 | ⚠️ 部分支援 | ✅ **完整保留** |
+| **自託管定時任務** | ❌ 無 | ❌ 無 | ✅ **完整支援** |
+| **通訊軟體串接** | ⚠️ 需複雜設定 | ❌ 無 | ✅ **原生支援** |
+| **自我改進技能** | ❌ 無 | ❌ 無 | ✅ **具備** |
+| **數據自主權** | ❌ 存於雲端 | ✅ 存於本地 | ✅ **存於本地** |
 
-† Claude Code has CLAUDE.md / MEMORY.md project context and rolling auto-memory, but not full automatic cross-session recall  
-‡ Claude Code has cloud-managed scheduling (Anthropic infrastructure) and session-scoped `/loop`; no self-hosted cron
+## 完整安裝 (Mac 本地專屬)
 
-**The closest competitor is OpenClaw** — both are always-on, self-hosted, open-source agents
-with memory, cron, and messaging. The key differences: Hermes writes and saves its own skills
-automatically as a core behavior (OpenClaw's skill system centers on a community marketplace);
-Hermes is more stable across updates (OpenClaw has documented release regressions and ClawHub
-has had security incidents involving malicious skills); and Hermes runs natively in the Python
-ecosystem. See [HERMES.md](HERMES.md) for the full side-by-side.
-
----
-
-## Quick start
-
-Run the repo bootstrap:
+### 第一步：打開 Mac 的「終端機 (Terminal)」，完整複製並貼上指令：
 
 ```bash
-git clone https://github.com/nesquena/hermes-webui.git hermes-webui
+git clone https://github.com/richard19740827/hermes-webui.git
 cd hermes-webui
 python3 bootstrap.py
 ```
 
-Or keep using the shell launcher:
-
-```bash
-./start.sh
-```
-
-For self-hosted VM or homelab installs, `ctl.sh` wraps the common daemon lifecycle commands without requiring `fuser` or `pkill`:
-
-```bash
-./ctl.sh start              # background daemon, PID at ~/.hermes/webui.pid
-./ctl.sh status             # PID, uptime, bound host/port, log path, /health
-./ctl.sh logs --lines 100   # tail ~/.hermes/webui.log
-./ctl.sh restart
-./ctl.sh stop
-```
-
-`ctl.sh start` runs the bootstrap in foreground/no-browser mode behind the daemon wrapper, writes logs to `~/.hermes/webui.log`, and respects `.env` plus inline overrides such as `HERMES_WEBUI_HOST=0.0.0.0 ./ctl.sh start`.
-
-The bootstrap will:
-
-1. Detect Hermes Agent and, if missing, attempt the official installer (`curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash`).
-2. Find or create a Python environment with the WebUI dependencies.
-3. Start the web server and wait for `/health`.
-4. Open the browser unless you pass `--no-browser`.
-5. Drop you into a first-run onboarding wizard inside the WebUI.
-
-> Native Windows is not supported for this bootstrap yet. Use Linux, macOS, or WSL2.
-> For Windows / WSL auto-start at login, see [`docs/wsl-autostart.md`](docs/wsl-autostart.md).
-
-If provider setup is still incomplete after install, the onboarding wizard will point you to finish it with `hermes model` instead of trying to replicate the full CLI setup in-browser.
-
----
-
-## Docker
-
-**Pre-built images** (amd64 + arm64) are published to GHCR on every release.
-
-For a comprehensive setup guide covering all 3 compose files, common failure modes, and bind-mount migration, see [`docs/docker.md`](docs/docker.md). The README covers the 5-minute happy path.
-
-### 5-minute quickstart (single container)
-
-The simplest setup: one WebUI container that runs the agent in-process.
-
-```bash
-git clone https://github.com/nesquena/hermes-webui
-cd hermes-webui
-cp .env.docker.example .env
-# Edit .env if your host UID isn't 1000 (e.g. macOS where UIDs start at 501)
-docker compose up -d
-# Open http://localhost:8787
-```
-
-The container auto-detects your UID/GID from the mounted `~/.hermes` volume so files written by the agent stay readable by you on the host.
-
-To enable password protection (required if you expose the port outside `127.0.0.1`):
-
-```bash
-echo "HERMES_WEBUI_PASSWORD=change-me-to-something-strong" >> .env
-docker compose up -d --force-recreate
-```
-
-### Manual `docker run` (no compose)
-
-```bash
-docker pull ghcr.io/nesquena/hermes-webui:latest
-docker run -d \
-  -e WANTED_UID=$(id -u) -e WANTED_GID=$(id -g) \
-  -v ~/.hermes:/home/hermeswebui/.hermes \
-  -e HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui \
-  -v ~/workspace:/workspace \
-  -p 127.0.0.1:8787:8787 \
-  ghcr.io/nesquena/hermes-webui:latest
-```
-
-### Build locally
-
-```bash
-docker build -t hermes-webui .
-docker run -d \
-  -e WANTED_UID=$(id -u) -e WANTED_GID=$(id -g) \
-  -v ~/.hermes:/home/hermeswebui/.hermes \
-  -e HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui \
-  -v ~/workspace:/workspace \
-  -p 127.0.0.1:8787:8787 \
-  hermes-webui
-```
-
-### Multi-container setups
-
-If you want the agent and WebUI in separate containers (for isolation, or because you're already running an agent gateway elsewhere):
-
-```bash
-# Agent + WebUI
-docker compose -f docker-compose.two-container.yml up -d
-
-# Agent + Dashboard + WebUI
-docker compose -f docker-compose.three-container.yml up -d
-```
-
-Both compose files use **named Docker volumes** by default, which solves the UID/GID problem by construction. If you need bind mounts to share an existing host directory, see [`docs/docker.md`](docs/docker.md) for the full migration recipe.
-
-> **Known limitation (#681)**: in the two-container setup, tools triggered from the WebUI run in the **WebUI container**, not the agent container. If you need git/node/etc. on the WebUI's filesystem, either use the single-container setup, extend the WebUI Dockerfile, or use the community [all-in-one image](https://github.com/sunnysktsang/hermes-suite).
-
-### Common failure modes
-
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `PermissionError` at startup | UID mismatch on bind mount | Set `UID=$(id -u)` in `.env` |
-| `.env: permission denied` (#1389) | `fix_credential_permissions()` enforced 0600 | Set `HERMES_SKIP_CHMOD=1` in `.env` |
-| Workspace appears empty | UID mismatch on `/workspace` mount | Set `UID=$(id -u)` in `.env` |
-| `git: command not found` in chat | Two-container architectural limit (#681) | Use single-container or extend Dockerfile |
-| WebUI can't find agent source | `hermes-agent-src` volume misconfigured | Use the named volumes from compose files as-is |
-| Podman shared `.hermes` fails | Podman 3.4 `keep-id` limitation | Use Podman 4+ or single-container |
-
-For the deep dive on each of these, see [`docs/docker.md`](docs/docker.md).
-
-> **Note:** By default, Docker Compose binds to `127.0.0.1` (localhost only).
-> To expose on a network, change the port to `"8787:8787"` in `docker-compose.yml`
-> and set `HERMES_WEBUI_PASSWORD` to enable authentication.
-
----
-
-## What start.sh discovers automatically
-
-| Thing | How it finds it |
-|---|---|
-| Hermes agent dir | `HERMES_WEBUI_AGENT_DIR` env, then `~/.hermes/hermes-agent`, then sibling `../hermes-agent` |
-| Python executable | Agent venv first, then `.venv` in this repo, then system `python3` |
-| State directory | `HERMES_WEBUI_STATE_DIR` env, then `~/.hermes/webui-mvp` |
-| Default workspace | `HERMES_WEBUI_DEFAULT_WORKSPACE` env, then `~/workspace`, then state dir |
-| Port | `HERMES_WEBUI_PORT` env or first argument, default `8787` |
-
-If discovery finds everything, nothing else is required.
-
----
-
-## Overrides (only needed if auto-detection misses)
-
-```bash
-export HERMES_WEBUI_AGENT_DIR=/path/to/hermes-agent
-export HERMES_WEBUI_PYTHON=/path/to/python
-export HERMES_WEBUI_PORT=9000
-export HERMES_WEBUI_AUTO_INSTALL=1  # enable auto-install of agent deps (disabled by default)
-./start.sh
-```
-
-Or inline:
-
-```bash
-HERMES_WEBUI_AGENT_DIR=/custom/path ./start.sh 9000
-```
-
-Full list of environment variables:
-
-| Variable | Default | Description |
-|---|---|---|
-| `HERMES_WEBUI_AGENT_DIR` | auto-discovered | Path to the hermes-agent checkout |
-| `HERMES_WEBUI_PYTHON` | auto-discovered | Python executable |
-| `HERMES_WEBUI_HOST` | `127.0.0.1` | Bind address (`0.0.0.0` for all IPv4, `::` for all IPv6, `::1` for IPv6 loopback) |
-| `HERMES_WEBUI_PORT` | `8787` | Port |
-| `HERMES_WEBUI_STATE_DIR` | `~/.hermes/webui-mvp` | Where sessions and state are stored |
-| `HERMES_WEBUI_DEFAULT_WORKSPACE` | `~/workspace` | Default workspace |
-| `HERMES_WEBUI_DEFAULT_MODEL` | `openai/gpt-5.4-mini` | Default model |
-| `HERMES_WEBUI_PASSWORD` | *(unset)* | Set to enable password authentication |
-| `HERMES_WEBUI_EXTENSION_DIR` | *(unset)* | Optional local directory served at `/extensions/`; must point to an existing directory before extension injection is enabled |
-| `HERMES_WEBUI_EXTENSION_SCRIPT_URLS` | *(unset)* | Optional comma-separated same-origin script URLs to inject; see [WebUI Extensions](docs/EXTENSIONS.md) |
-| `HERMES_WEBUI_EXTENSION_STYLESHEET_URLS` | *(unset)* | Optional comma-separated same-origin stylesheet URLs to inject; see [WebUI Extensions](docs/EXTENSIONS.md) |
-| `HERMES_HOME` | `~/.hermes` | Base directory for Hermes state (affects all paths) |
-| `HERMES_CONFIG_PATH` | `~/.hermes/config.yaml` | Path to Hermes config file |
-
----
-
-## Accessing from a remote machine
-
-The server binds to `127.0.0.1` by default (loopback only). If you are running
-Hermes on a VPS or remote server, use an SSH tunnel from your local machine:
-
-```bash
-ssh -N -L <local-port>:127.0.0.1:<remote-port> <user>@<server-host>
-```
-
-Example:
-
-```bash
-ssh -N -L 8787:127.0.0.1:8787 user@your.server.com
-```
-
-Then open `http://localhost:8787` in your local browser.
-
-`start.sh` will print this command for you automatically when it detects you
-are running over SSH.
-
----
-
-## Accessing on your phone with Tailscale
-
-[Tailscale](https://tailscale.com) is a zero-config mesh VPN built on
-WireGuard. Install it on your server and your phone, and they join the same
-private network -- no port forwarding, no SSH tunnels, no public exposure.
-
-The Hermes Web UI is fully responsive with a mobile-optimized layout
-(hamburger sidebar, sidebar top tabs in the drawer, touch-friendly controls),
-so it works well as a daily-driver agent interface from your phone.
-
-**Setup:**
-
-1. Install [Tailscale](https://tailscale.com/download) on your server and
-   your iPhone/Android.
-2. Start the WebUI listening on all interfaces with password auth enabled:
-
-```bash
-HERMES_WEBUI_HOST=0.0.0.0 HERMES_WEBUI_PASSWORD=your-secret ./start.sh
-```
-
-3. Open `http://<server-tailscale-ip>:8787` in your phone's browser
-   (find your server's Tailscale IP in the Tailscale app or with
-   `tailscale ip -4` on the server).
-
-That's it. Traffic is encrypted end-to-end by WireGuard, and password auth
-protects the UI at the application level. You can add it to your home screen
-for an app-like experience.
-
-> **Tip:** If using Docker, set `HERMES_WEBUI_HOST=0.0.0.0` in your
-> `docker-compose.yml` environment (already the default) and set
-> `HERMES_WEBUI_PASSWORD`.
-
----
-
-## Manual launch (without start.sh)
-
-If you prefer to launch the server directly:
-
-```bash
-cd /path/to/hermes-agent          # or wherever sys.path can find Hermes modules
-HERMES_WEBUI_PORT=8787 venv/bin/python /path/to/hermes-webui/server.py
-```
-
-Note: use the agent venv Python (or any Python environment that has the Hermes agent dependencies installed). System Python will be missing `openai`, `httpx`, and other required packages.
-
-Health check:
-
-```bash
-curl http://127.0.0.1:8787/health
-```
-
----
-
-## Running tests
-
-Tests discover the repo and the Hermes agent dynamically -- no hardcoded paths.
+### 第二步：未來的日常啟動
+當您完成第一次安裝後，未來每天想呼叫 AI 教授時，只需要進入資料夾並按下啟動開關：
 
 ```bash
 cd hermes-webui
-pytest tests/ -v --timeout=60
+./start.sh
 ```
 
-Or using the agent venv explicitly:
+(啟動後，只要不關閉這個黑視窗，您的 AI 守護者就會持續在背景為您服務。)
+
+###  自動引導程序將為您完成：
+1. **自動偵測**：檢查您的 M4 Mac 是否已安裝 Hermes 代理人。
+2. **環境建置**：自動準備好 Python 執行環境，您不需要手動安裝零件。
+3. **健康檢查**：啟動網頁伺服器並確保運作正常。
+4. **自動導航**：完成後自動幫您打開瀏覽器，進入「新手引導教學」。
+
+---
+
+##  自動偵測機制 (start.sh)
+
+守護者的啟動腳本非常聰明，它會自動尋找以下零件：
+- **大腦路徑**：自動尋找您的 `~/Hermes_Gion_Core/hermes-agent` 資料夾。
+- **執行引擎**：自動定位 Python 的位置。
+- **記憶目錄**：預設已鎖定為 `~/Hermes_Gion_Core/webui_history`。
+
+---
+
+## 環境開關 (Overrides)
+
+如果您有特殊需求（例如想換個連接埠），可以在啟動時手動輸入開關：
+- `HERMES_WEBUI_PORT=9000`：把網頁大門改到 9000 號。
+- `HERMES_WEBUI_BOT_NAME`：為您的 AI 助手取個響亮的名字。
+
+---
+
+## 如何連線存取守護者？
+
+根據您的所在位置，有三種簡單的存取方式：
+
+### 1. 在本地主機 (Mac) 直接使用 (最推薦)
+啟動後，在瀏覽器輸入 `http://localhost:8787` 即可開始對話。
+
+### 2. 在區域網路使用：如手機/平板
+只要行動裝置與主機連接相同 Wi-Fi，在行動裝置瀏覽器輸入主機的區網 IP (如 `http://192.168.x.x:8787`) 即可。
+*(提示：本系統已預設開啟區域網路共享，您無需額外設定指令。)*
+
+### 3. 出門在外遠端存取 (免 VPN 方案)
+若您人在戶外，建議透過您的 **群暉 (Synology) NAS** 設定「反向代理」：
+- **操作路徑**：群暉控制面板 > 登錄門戶 > 進階 > 反向代理伺服器。
+- **優點**：全中文設定，支援 HTTPS 加密連線，手機無需安裝任何軟體。
+- **核心設定**：將來源 `HTTPS:443` 轉接至目的端（Mac 主機）的 `HTTP:8787`，**請務必在「自訂標頭」中開啟 WebSocket 支援。**
+
+---
+
+## 手動啟動 (進階檢修)
+
+如果您在啟動過程中遇到問題，或是想查看詳細的後台日誌，可以使用手動模式：
 
 ```bash
-/path/to/hermes-agent/venv/bin/python -m pytest tests/ -v
-```
+# 進入透明路徑中的大腦目錄
+cd ~/Hermes_Gion_Core/hermes-agent
 
-Tests run against an isolated server on port 8788 with a separate state directory.
-Production data and real cron jobs are never touched. Current count: **3309 tests**
-across 100+ test files.
+# 使用透明路徑中的環境與路徑啟動伺服器
+~/Hermes_Gion_Core/hermes-agent/venv/bin/python ~/Hermes_Gion_Core/hermes-webui/server.py
 
----
+## 核心功能 (Features)
 
-## Features
+### 對話與智慧助手 (Chat and Agent)
+- **即時串流響應**：對話像打字一樣即時顯示，不需要等待整個段落生成。
+- **多模型支持**：支持 OpenAI、Google (Gemini)、Claude、DeepSeek 等主流模型，隨時切換。
+- **消息隊列**：在 AI 思考時，您可以繼續傳送下一條訊息，它會自動排隊處理。
+- **歷史修正**：您可以直接修改過去的訊息，AI 會從該點重新開始對話。
+- **思考過程顯示**：支持顯示 AI 的「推理過程」（例如 O3 或 Claude 的思考區塊），讓您知道它是怎麼想的。
+- **內建繪圖功能**：自動渲染 Mermaid 流程圖、序列圖與甘特圖。
+- **工具調用卡片**：當 AI 使用搜尋、讀取檔案等工具時，會以簡潔的卡片顯示進度與結果。
+- **安全性審核**：執行危險的指令（如刪除檔案）前，會彈出卡片請求您的批准。
 
-### Chat and agent
-- Streaming responses via SSE (tokens appear as they are generated)
-- Multi-provider model support -- any Hermes API provider (OpenAI, Anthropic, Google, DeepSeek, Nous Portal, OpenRouter, MiniMax, Z.AI); dynamic model dropdown populated from configured keys
-- Send a message while one is processing -- it queues automatically
-- Edit any past user message inline and regenerate from that point
-- Retry the last assistant response with one click
-- Cancel a running task directly from the composer footer (Stop button next to Send)
-- Tool call cards inline -- each shows the tool name, args, and result snippet; expand/collapse all toggle for multi-tool turns
-- Subagent delegation cards -- child agent activity shown with distinct icon and indented border
-- Mermaid diagram rendering inline (flowcharts, sequence diagrams, gantt charts)
-- Thinking/reasoning display -- collapsible gold-themed cards for Claude extended thinking and o3 reasoning blocks
-- Approval card for dangerous shell commands (allow once / session / always / deny)
-- SSE auto-reconnect on network blips (SSH tunnel resilience)
-- File attachments persist across page reloads
-- Message timestamps (HH:MM next to each message, full date on hover)
-- Code block copy button with "Copied!" feedback
-- Syntax highlighting via Prism.js (Python, JS, bash, JSON, SQL, and more)
-- Safe HTML rendering in AI responses (bold, italic, code converted to markdown)
-- rAF-throttled token streaming for smoother rendering during long responses
-- Context usage indicator in composer footer -- token count, cost, and fill bar (model-aware)
+### 會話紀錄管理 (Sessions)
+- **不遺忘的記憶**：所有的對話都會自動存檔，支持更名、搜尋、釘選與分類。
+- **專案與標籤**：可以使用 #標籤 來分類您的公益項目，方便快速檢索。
+- **CLI 橋接器**：如果您以前用過黑視窗 (Terminal) 版本，這裡會自動同步那些舊的紀錄。
+- **數據導出**：支持將對話導出為 Markdown 格式（方便寫文章）或 JSON 格式（方便備份）。
 
-### Sessions
-- Create, rename, duplicate, delete, search by title and message content
-- Session actions via `⋯` dropdown per session — pin, move to project, archive, duplicate, delete
-- Pin/star sessions to the top of the sidebar (gold indicator)
-- Archive sessions (hide without deleting, toggle to show)
-- Session projects -- named groups with colors for organizing sessions
-- Session tags -- add #tag to titles for colored chips and click-to-filter
-- Grouped by Today / Yesterday / Earlier in the sidebar (collapsible date groups)
-- Download as Markdown transcript, full JSON export, or import from JSON
-- Sessions persist across page reloads and SSH tunnel reconnects
-- Browser tab title reflects the active session name
-- CLI session bridge -- CLI sessions from hermes-agent's SQLite store appear in the sidebar with a gold "cli" badge; click to import with full history and reply normally
-- Token/cost display -- input tokens, output tokens, estimated cost shown per conversation (toggle in Settings or `/usage` command)
+### 工作空間檔案瀏覽 (Workspace)
+- ** Finder 式體驗**：直接在瀏覽器中查看您的 Mac 檔案夾，支持點擊展開與導航。
+- **在線預覽與編輯**：直接查看程式碼、文本、Markdown 甚至圖片，並能直接在網頁修改。
+- **Git 狀態顯示**：如果您在做網頁開發，它會顯示目前的代碼分支與修改數量。
 
-### Workspace file browser
-- Directory tree with expand/collapse (single-click toggles, double-click navigates)
-- Breadcrumb navigation with clickable path segments
-- Preview text, code, Markdown (rendered), and images inline
-- Edit, create, delete, and rename files; create folders
-- Binary file download (auto-detected from server)
-- File preview auto-closes on directory navigation (with unsaved-edit guard)
-- Git detection -- branch name and dirty file count badge in workspace header
-- Right panel is drag-resizable
-- Syntax highlighted code preview (Prism.js)
+### 語音與身分 (Voice and Profiles)
+- **語音輸入**：內建麥克風按鈕，點擊即可對話，支持自動斷句（目前僅限支持的瀏覽器）。
+- **身分切換 (Profiles)**：您可以為 AI 設定不同的「身分」（例如：公益秘書、技術顧問），切換身分時會同步切換記憶與規則。
 
-### Voice input
-- Microphone button in the composer (Web Speech API)
-- Tap to record, tap again or send to stop
-- Live interim transcription appears in the textarea
-- Auto-stops after ~2s of silence
-- Appends to existing textarea content (doesn't replace)
-- Hidden when browser doesn't support Web Speech API (Chrome, Edge, Safari)
+### 安全與外觀 (Security and Themes)
+- **密碼保護**：可選的登入密碼功能，確保即使您在手機上遙控，別人也進不去。
+- **豐富主題**：內建 7 種主題，包括「純黑 OLED」護眼模式。
+- **斜槓指令 (Slash Commands)**：在輸入框打 `/` 即可快速執行功能，如 `/help`、`/clear` 或 `/theme`。
 
-### Profiles
-- Profile chip in the **composer footer** -- dropdown showing all profiles with gateway status and model info
-- Gateway status dots (green = running), model info, skill count per profile
-- Profiles management panel -- create, switch, and delete profiles from the sidebar
-- Clone config from active profile on create
-- Optional custom endpoint fields on create -- Base URL and API key written into the profile's `config.yaml` at creation time, so Ollama, LMStudio, and other local endpoints can be configured without editing files manually
-- Seamless switching -- no server restart; reloads config, skills, memory, cron, models
-- Per-session profile tracking (records which profile was active at creation)
-
-### Authentication and security
-- Optional password auth -- off by default, zero friction for localhost
-- Enable via `HERMES_WEBUI_PASSWORD` env var or Settings panel
-- Signed HMAC HTTP-only cookie with 24h TTL
-- Minimal dark-themed login page at `/login`
-- Security headers on all responses (X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
-- 20MB POST body size limit
-- CDN resources pinned with SRI integrity hashes
-
-### Themes
-- 7 built-in themes: Dark (default), Light, Slate, Solarized Dark, Monokai, Nord, OLED
-- Switch via Settings panel dropdown (instant live preview) or `/theme` command
-- Persists across reloads (server-side in settings.json + localStorage for flicker-free loading)
-- Custom themes: define a `:root[data-theme="name"]` CSS block and it works — see [THEMES.md](THEMES.md)
-
-### Settings and configuration
-- **Hermes Control Center** (sidebar launcher button) -- Conversation tab (export/import/clear), Preferences tab (model, send key, theme, language, all toggles), System tab (version, password)
-- Send key: Enter (default) or Ctrl/Cmd+Enter
-- Show/hide CLI sessions toggle (enabled by default)
-- Token usage display toggle (off by default, also via `/usage` command)
-- Control Center always opens on the Conversation tab; resets on close
-- Unsaved changes guard -- discard/save prompt when closing with unpersisted changes
-- Cron completion alerts -- toast notifications and unread badge on Tasks tab
-- Background agent error alerts -- banner when a non-active session encounters an error
-
-### Slash commands
-- Type `/` in the composer for autocomplete dropdown
-- Built-in: `/help`, `/clear`, `/compress [focus topic]`, `/compact` (alias), `/model <name>`, `/workspace <name>`, `/new`, `/usage`, `/theme`
-- Arrow keys navigate, Tab/Enter select, Escape closes
-- Unrecognized commands pass through to the agent
-
-### Panels
-- **Chat** -- session list, search, pin, archive, projects, new conversation
-- **Tasks** -- view, create, edit, run, pause/resume, delete cron jobs; run history; completion alerts
-- **Skills** -- list all skills by category, search, preview, create/edit/delete; linked files viewer
-- **Memory** -- view and edit MEMORY.md and USER.md inline
-- **Profiles** -- create, switch, delete agent profiles; clone config
-- **Todos** -- live task list from the current session
-- **Spaces** -- add, rename, remove workspaces; quick-switch from topbar
-
-### Mobile responsive
-- Hamburger sidebar -- slide-in overlay on mobile (<640px)
-- Sidebar top tabs stay available on mobile; no fixed bottom nav stealing chat height
-- Files slide-over panel from right edge
-- Touch targets minimum 44px on all interactive elements
-- Full-height chat/composer on phones without bottom-nav spacing
-- Desktop layout completely unchanged
+### 專門控制面板 (Panels)
+- **定時任務 (Tasks)**：管理您的自動化腳本，設定 AI 在特定時間執行公益任務。
+- **技能系統 (Skills)**：查看 AI 已經學會的技能，並能直接編輯其運作邏輯。
+- **核心記憶 (Memory)**：直接編輯 `MEMORY.md` 與 `USER.md`。這是 AI 永遠記住「您是誰」以及「您的公益目標」的核心文件。
 
 ---
 
-## Architecture
+##  系統架構：家園的零件清單
 
-```
-server.py               HTTP routing shell + auth middleware (~154 lines)
-api/
-  auth.py               Optional password authentication, signed cookies (~201 lines)
-  config.py             Discovery, globals, model detection, reloadable config (~1110 lines)
-  helpers.py            HTTP helpers, security headers (~175 lines)
-  models.py             Session model + CRUD + CLI bridge (~377 lines)
-  onboarding.py         First-run onboarding wizard, OAuth provider support (~507 lines)
-  profiles.py           Profile state management, hermes_cli wrapper (~411 lines)
-  routes.py             All GET + POST route handlers (~2250 lines)
-  state_sync.py         /insights sync — message_count to state.db (~113 lines)
-  streaming.py          SSE engine, run_agent, cancel support (~660 lines)
-  updates.py            Self-update check and release notes (~257 lines)
-  upload.py             Multipart parser, file upload handler (~82 lines)
-  workspace.py          File ops, workspace helpers, git detection (~288 lines)
-static/
-  index.html            HTML template (~600 lines)
-  style.css             All CSS incl. mobile responsive, themes (~1050 lines)
-  ui.js                 DOM helpers, renderMd, tool cards, context indicator (~1740 lines)
-  workspace.js          File preview, file ops, git badge (~286 lines)
-  sessions.js           Session CRUD, collapsible groups, search, reload recovery (~800 lines)
-  messages.js           send(), SSE handlers, live streaming, session recovery (~655 lines)
-  panels.js             Cron, skills, memory, profiles, settings (~1438 lines)
-  commands.js           Slash command autocomplete (~267 lines)
-  boot.js               Mobile nav, voice input, boot IIFE (~524 lines)
-tests/
-  conftest.py           Isolated test server (port 8788)
-  61 test files          961 test functions
-Dockerfile              python:3.12-slim container image
-docker-compose.yml      Compose with named volume and optional auth
-.github/workflows/      CI: multi-arch Docker build + GitHub Release on tag
-```
+為了讓系統保持清淨、透明，我們將零件分為以下幾個核心區塊：
 
-State lives outside the repo at `~/.hermes/webui-mvp/` by default
-(sessions, workspaces, settings, projects, last_workspace). Override with `HERMES_WEBUI_STATE_DIR`.
+### 1. 後台大腦 (api/ 資料夾) —— 負責思考與邏輯
+- `server.py`：**大門守衛**，負責處理所有的網路連線請求。
+- `auth.py`：**保險櫃鎖**，負責您的密碼與安全性。
+- `config.py`：**記憶管家**，負責偵測您的模型與設定檔。
+- `streaming.py`：**對話流水**，負責讓 AI 說話像流水一樣順暢地顯示。
+- `workspace.py`：**檔案工頭**，負責管理您在 Finder 看到的那些檔案。
+
+### 2. 前台皮囊 (static/ 資料夾) —— 您看到的網頁介面
+- `index.html`：**房屋骨架**。
+- `style.css`：**裝潢設計**，決定了深色主題或 OLED 護眼模式。
+- `ui.js` & `messages.js`：**動作行為**，處理您點擊按鈕、傳送訊息的反應。
+
+### 3. 數據落腳處 (State)
+- **記憶不遺忘**：預設存放在 `~/Hermes_Gion_Core`。
+- 這裡存著您的會話紀錄、設定檔與工作空間，即使您更新了程式碼，這些「生命之書」的內容也不會消失。
 
 ---
 
-## Docs
+##  開發指南 (Docs)
 
-- `HERMES.md` -- why Hermes, mental model, and detailed comparison to Claude Code / Codex / OpenCode / Cursor
-- `ROADMAP.md` -- feature roadmap and sprint history
-- `ARCHITECTURE.md` -- system design, all API endpoints, implementation notes
-- `TESTING.md` -- manual browser test plan and automated coverage reference
-- `CHANGELOG.md` -- release notes per sprint
-- `SPRINTS.md` -- forward sprint plan with CLI + Claude parity targets
-- `THEMES.md` -- theme system documentation, custom theme guide
-- `docs/troubleshooting.md` -- diagnostic flows for common failures (e.g. "AIAgent not available")
+如果您想更深入研究這座腳架，可以翻閱這些文件：
+- `HERMES.md`：為什麼選擇此系統與同類工具的深度對比。
+- `ROADMAP.md`：未來的開發藍圖與計畫。
+- `ARCHITECTURE.md`：更詳細的技術架構與數據接口說明。
+- `THEMES.md`：如何客製化您喜歡的網頁外觀。
 
-## Contributors
+---
 
-Hermes WebUI is built with help from the open-source community. Every PR — whether merged directly or incorporated via batch release — shapes the project, and we're grateful to everyone who has taken the time to contribute.
+##  頂尖貢獻者排行榜 (依修改次數)
 
-**66 contributors have shipped code that landed in a release tag** as of v0.50.245. The full credit roll lives in [`CONTRIBUTORS.md`](CONTRIBUTORS.md). The highlights:
+這份清單記錄了最常來幫我們修繕家園的數位志工：
 
-### Top contributors (by merged-PR count)
-
-| # | Contributor | PRs | First → latest release |
+| 排名 | 貢獻者 | 修改次數 | 活躍時間 |
 |---|---|---:|---|
-| 1 | [@franksong2702](https://github.com/franksong2702) | 22 | `v0.50.49` → `v0.50.245` |
-| 2 | [@bergeouss](https://github.com/bergeouss) | 18 | `v0.50.49` → `v0.50.240` |
-| 3 | [@aronprins](https://github.com/aronprins) | 8 | `v0.47.0` → `v0.50.77` |
-| 4 | [@iRonin](https://github.com/iRonin) | 6 | `v0.41.0` |
-| 5 | [@24601](https://github.com/24601) | 6 | `v0.50.201` |
-| 6 | [@KingBoyAndGirl](https://github.com/KingBoyAndGirl) | 4 | `v0.50.232` → `v0.50.237` |
-| 7 | [@renheqiang](https://github.com/renheqiang) | 4 | `v0.50.93` |
-| 8 | [@ccqqlo](https://github.com/ccqqlo) | 3 | `v0.50.83` → `v0.50.207` |
-| 9 | [@deboste](https://github.com/deboste) | 3 | `v0.16.1` |
-| 10 | [@frap129](https://github.com/frap129) | 3 | `v0.50.157` → `v0.50.166` |
+| 1 | [@franksong2702] | 22 次 | 最勤奮，優化了介面各種細節 |
+| 2 | [@bergeouss] | 18 次 | 強化了 Docker 與後台管理 |
+| 3 | [@aronprins] | 8 次 | 系統大翻修的首席設計師 |
+| 4 | [@iRonin] | 6 次 | 安全性守護神 |
 
-See [`CONTRIBUTORS.md`](CONTRIBUTORS.md) for the full ranked list of all 66 contributors, including everyone with one or two merged PRs and the special-thanks roll for design and architectural contributions.
+*查看 [`CONTRIBUTORS.md`](CONTRIBUTORS.md) 了解完整的 66 位志工名單。*
 
-### Notable contributions
+### 顯著貢獻者 (致謝)
 
-**[@aronprins](https://github.com/aronprins)** — v0.50.0 UI overhaul (PR #242)
-The biggest single contribution to the project: a complete UI redesign that moved model/profile/workspace controls into the composer footer, replaced the gear-icon settings panel with the Hermes Control Center (tabbed modal), removed the activity bar in favor of inline composer status, redesigned the session list with a `⋯` action dropdown, and added the workspace panel state machine. 26 commits, thoroughly designed and iterated through multiple review rounds.
+這座守護者家園能有今天的樣貌，要感謝全球 66 位志工的無私奉獻。以下是幾位關鍵的建築師：
 
-**[@iRonin](https://github.com/iRonin)** — Security hardening sprint (PRs #196–#204)
-Six consecutive security and reliability PRs: session memory leak fix (expired token pruning), Content-Security-Policy + Permissions-Policy headers, 30-second slow-client connection timeout, optional HTTPS/TLS support via environment variables, upstream branch tracking fix for self-update, and CLI session support in the file browser API. This is the kind of focused, high-quality security work that makes a self-hosted tool trustworthy.
+- **[@aronprins]** — **介面大翻修**：他重新設計了輸入框與控制面板，讓系統變得更直觀，這也是您現在看到的美麗外貌。
+- **[@iRonin]** — **安全性加固**：他進行了六次重大的安全升級，包含防止數據洩漏與加密通訊，讓這套「自託管」系統變得真正安全可靠。
+- **[@DavidSchuchert]** — **多語系支持**：他完善了翻譯系統，這也是我們現在能將它「中文化」的技術基石。
+- **[@Jordan-SkyLF]** — **對話恢復與記憶強化**：他開發了讓對話在斷線後能自動找回的技術，確保您的「生命之書」不會因為網頁重新整理而中斷。
 
-**[@DavidSchuchert](https://github.com/DavidSchuchert)** — German translation (PR #190)
-Complete German locale (`de`) covering all UI strings, settings labels, commands, and system messages — and in doing so, stress-tested the i18n system and exposed several elements that weren't yet translatable, which got fixed as part of the same PR.
+### 功能與特性貢獻
 
-**[@Jordan-SkyLF](https://github.com/Jordan-SkyLF)** — Live streaming, session recovery, workspace fallback (PRs #366, #367)
-Three interlocking improvements: workspace fallback resolution so the server recovers gracefully when the configured workspace is deleted or unavailable; live reasoning cards that upgrade the generic thinking spinner to a real-time reasoning display as the model thinks; and durable session state recovery via `localStorage` so in-flight tool cards, partial assistant output, and the live SSE stream all survive a full page reload or session switch.
+- **[@franksong2702]** — **最勤奮的守護者**：貢獻了 22 次修改，優化了移動端佈局與工作區導航，讓您在手機上也能流暢使用。
+- **[@Argonaut790]** — **繁體中文支持**：他親手為我們準備了繁體中文的翻譯包，讓這座家園對我們來說不再陌生。
+- **[@kevin-ho]** — **護眼黑漆 (OLED 主題)**：專門為 OLED 螢幕設計了純黑主題，減少耗電也保護您的眼睛。
+- **[@gabogabucho]** — **新手引導精靈**：設計了第一次啟動時的導引畫面，降低了大家進入 AI 世界的門檻。
 
-### Feature contributions
+### 錯誤修復與安全防護
 
-**[@gabogabucho](https://github.com/gabogabucho)** — Spanish locale + onboarding wizard (PRs #275, #285)
-Full Spanish (`es`) locale covering all 175 UI strings, plus the one-shot bootstrap onboarding wizard that guides new users through provider setup on first launch — the feature most responsible for new users actually getting started.
-
-**[@bergeouss](https://github.com/bergeouss)** — Provider management UI + gateway sync + Docker hardening (18 PRs, `v0.50.49` → `v0.50.240`)
-Real-time gateway session sync (Telegram/Discord/Slack into the WebUI sidebar via SSE), the provider management UI for adding/editing custom providers from Settings, the two-container Docker setup docs, OAuth provider status detection, profile isolation hardening (per-profile `.env` secrets), and the bulk of what users see when they touch Settings → Providers.
-
-**[@ccqqlo](https://github.com/ccqqlo)** — Terminal approval UX + custom model discovery + mobile close button (PRs #224, #225, #238, #333)
-A run of focused quality-of-life improvements: terminal tool approval prompts that stay visible long enough to actually be read, restored custom model API key discovery, and the redundant mobile close button fix that had been confusing users on narrow screens.
-
-**[@kevin-ho](https://github.com/kevin-ho)** — OLED theme (PR #168)
-Added the 7th built-in theme: pure black backgrounds with warm accents tuned to reduce burn-in risk. Small diff, big impact for anyone on an OLED display.
-
-**[@Bobby9228](https://github.com/Bobby9228)** — Mobile Profiles button + Android Chrome fixes (PRs #253, #263, #265)
-Added the Profiles entry to the mobile navigation flow, making profile switching reachable on phones, plus a set of Android Chrome-specific fixes for the profile dropdown.
-
-**[@franksong2702](https://github.com/franksong2702)** — Most prolific external contributor (22 PRs, `v0.50.49` → `v0.50.245`)
-The session title guard, breadcrumb workspace navigation, mobile workspace panel sliver fix (#1300), composer footer container queries, streaming session sidebar exemption (#1327), session sidecar repair, cron output preservation (#1295), profile default workspace persistence, and a long tail of polish across the session sidebar, mobile responsive layout, and workspace state machine.
-
-**[@betamod](https://github.com/betamod)** — Security hardening (PR #171)
-A comprehensive security audit PR covering CSRF protection, SSRF guards, XSS escaping improvements, and the env race condition between concurrent agent sessions — foundational security work that shipped in v0.39.0.
-
-**[@TaraTheStar](https://github.com/TaraTheStar)** — Bot name + thinking blocks + login refactor (PRs #132, #176, #181)
-Made the assistant display name configurable throughout the UI, added thinking/reasoning block display in chat, and refactored the login page to use template variables instead of inline string replacement.
-
-**[@thadreber-web](https://github.com/thadreber-web)** — CLI session bridge (PR #56)
-The original CLI session bridge: reads CLI sessions from the agent's SQLite state store and surfaces them in the WebUI sidebar. This was the first bridge between the CLI and WebUI session worlds.
-
-**[@deboste](https://github.com/deboste)** — Reverse proxy auth + mobile responsive layout + model routing (PRs #3, #4, #5)
-Three of the very first community PRs: fixed EventSource/fetch to use the URL origin for reverse proxy setups, corrected model provider routing from config, and added mobile responsive layout with dvh viewport fix. Early foundation work.
-
-### Bug fix and security contributions
-
-**[@Hinotoi-agent](https://github.com/Hinotoi-agent)** — Profile .env secret isolation (PR #351)
-Fixed API key leakage between profiles on switch — switching from a profile with `OPENAI_API_KEY` to one without it left the key in the process environment for the duration of the session, effectively leaking credentials. A subtle and important security fix.
-
-**[@lawrencel1ng](https://github.com/lawrencel1ng)** — Bandit security fixes B310/B324/B110 + QuietHTTPServer (PR #354)
-Systematic bandit security scan fixes: URL scheme validation before `urlopen`, MD5 `usedforsecurity=False`, and 40+ bare `except: pass` blocks replaced with proper logging — plus `QuietHTTPServer` to stop client-disconnect log spam from SSE streams.
-
-**[@lx3133584](https://github.com/lx3133584)** — CSRF fix for reverse proxy on non-standard ports (PR #360)
-Fixed CSRF rejection for deployments behind Nginx Proxy Manager or similar on non-standard ports — a real-world blocker for anyone hosting on a port other than 80/443.
-
-**[@DelightRun](https://github.com/DelightRun)** — session_search fix for WebUI sessions (PR #356)
-The `session_search` tool silently returned "Session database not available" in every WebUI session. Tracked down the missing `SessionDB` injection in the streaming path and fixed it.
-
-**[@shaoxianbilly](https://github.com/shaoxianbilly)** — Unicode filename downloads (PR #378)
-Fixed `UnicodeEncodeError` crashes when downloading workspace files with Chinese, Japanese, or other non-ASCII names. Implemented proper `Content-Disposition` header with RFC 5987 `filename*=UTF-8''...` encoding.
-
-**[@huangzt](https://github.com/huangzt)** — Cancel interrupts agent (PR #244)
-Made the Cancel button actually interrupt the running agent and clean up UI state, rather than just hiding the button while the agent kept running.
-
-**[@tgaalman](https://github.com/tgaalman)** — Thinking card fix (PR #169)
-Fixed top-level reasoning fields being missed in the thinking card display — an edge case in how Claude's extended thinking blocks surface in the API response.
-
-**[@smurmann](https://github.com/smurmann)** — Custom provider routing fix (PR #189)
-Fixed model routing for slash-prefixed custom provider models, which were being misrouted in the model selector. A precise fix for a real edge case in multi-provider setups.
-
-**[@jeffscottward](https://github.com/jeffscottward)** — Claude Haiku model ID fix (PR #145)
-Caught and corrected the Claude Haiku model ID (`3-5` → `4-5`) immediately after the Anthropic release — the kind of quick community catch that keeps the model dropdown accurate.
-
-**[@kcclaw001](https://github.com/kcclaw001)** — Credential redaction in API responses (PR #243)
-Added credential redaction to all API response paths so API keys, tokens, and other secrets in session data or error messages are masked before reaching the browser.
-
-**[@mbac](https://github.com/mbac)** — Phantom "Custom" provider group fix (PR #191)
-Removed the phantom "Custom" optgroup that appeared in the model dropdown even when no custom provider was configured — a small but consistently confusing UI noise issue.
-
-**[@andrewy-wizard](https://github.com/andrewy-wizard)** — Chinese localization (PR #177)
-Added Simplified Chinese (`zh`) locale to the WebUI. One of the first non-English locales and the most-used non-English locale in the codebase.
-
-**[@mmartial](https://github.com/mmartial)** — Docker UID/GID matching (PR #237)
-Added Docker support for running as an arbitrary UID/GID matching the host user, eliminating permission issues with bind-mounted volumes — essential for Docker deployments where the host user isn't UID 1000.
-
-**[@vCillusion](https://github.com/vCillusion)** — pip package resolution fix (PR #76)
-Fixed agent dependency resolution to prefer packages from the venv's site-packages over the agent directory itself, preventing shadowing bugs when developing locally.
-
-**[@carlytwozero](https://github.com/carlytwozero)** — API key pass-through for non-Anthropic providers (PR #78)
-Fixed `api_key` not being passed to `AIAgent` for non-Anthropic `/anthropic` providers — a quiet regression that silently broke any non-default provider.
-
-**[@mangodxd](https://github.com/mangodxd)** — Type hints cleanup (PR #115)
-Added missing type hints across 10 files and corrected 9 inaccurate existing ones — the kind of maintenance work that makes the codebase easier to reason about.
-
-**[@Argonaut790](https://github.com/Argonaut790)** — HTML entity decode + Traditional Chinese locale (PR #239)
-Fixed double-escaping of HTML entities in `renderMd()` — LLM output containing `&lt;code&gt;` was being escaped a second time, rendering as literal text instead of the intended markdown. The same PR also completed the Simplified Chinese translation (40+ missing keys) and added a full Traditional Chinese (`zh-Hant`) locale.
-
-**[@indigokarasu](https://github.com/indigokarasu)** — Visual redesign proposal: icon rail + design token system + 7 themes (PR #213)
-A CSS-only redesign of the full UI — proper design tokens (`--bg-primary`, `--text-info`, spacing scale), an icon rail sidebar replacing the emoji tab strip, consistent form cards, breadcrumb nav, and 7 built-in themes as custom properties. The PR didn't merge as-is but directly shaped the design language and theme architecture that shipped in v0.50.0.
-
-**[@zenc-cp](https://github.com/zenc-cp)** — Anti-hallucination guard for ReAct loop (PR #133)
-Added a streaming token buffer and post-run message scrub to `streaming.py` to detect and strip fake tool execution JSON that weaker models write inline instead of calling tools properly. A three-layer approach: ephemeral anti-hallucination prompt, live token filtering, and session history cleanup. The pattern influenced later streaming.py improvements.
+- **[@Hinotoi-agent]**：修復了不同帳號間的秘密洩漏問題，確保隱私。
+- **[@lawrencel1ng]**：系統性地掃描並修復了多處代碼漏洞，讓系統更健壯。
+- **[@shaoxianbilly]**：修復了中文、日文檔名下載時會亂碼或當機的問題。
+- **[@zenc-cp]**：增加了「反幻覺」機制，防止 AI 隨口胡說八道，確保資訊的真實性。
 
 ---
 
-Want to contribute? See [ARCHITECTURE.md](ARCHITECTURE.md) for the codebase layout and [TESTING.md](TESTING.md) for how to run the test suite. The best contributions are focused, well-tested, and solve a real problem — exactly what every person on this list did.
+## 參與貢獻
+如果您也想為「祇園守護者」出一份力，歡迎查看 `ARCHITECTURE.md` 了解我們的建築藍圖，或是透過 `TESTING.md` 協助我們進行測試。最好的貢獻就是解決一個真實存在的問題。
 
-## Repo
-
-```
-git@github.com:nesquena/hermes-webui.git
-```
+## 儲存庫連結
+```bash
+git@github.com:richard19740827/hermes-webui.git
