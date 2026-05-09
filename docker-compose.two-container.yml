@@ -56,15 +56,10 @@ services:
       # Remove 127.0.0.1: to expose on the host network (e.g. for remote clients).
       - "127.0.0.1:8642:8642"
     volumes:
-      # Persist config, state, sessions, skills, memory across restarts
-      - hermes-home:/home/hermes/.hermes
-      # Expose agent source so the WebUI can install dependencies from it
-      - hermes-agent-src:/opt/hermes
+      - ${HERMES_HOME:-${HOME}/Hermes_Gion_Core}:/home/hermes/.hermes
+      - ${HOME}/Hermes_Gion_Core/hermes-agent:/opt/hermes
     environment:
-      - HERMES_HOME=/home/hermes/.hermes
-      # Align UID/GID across containers sharing the hermes-home volume.
-      # Defaults to 1000 to match WANTED_UID/WANTED_GID in the webui service.
-      # The agent image's entrypoint already supports usermod remapping.
+      - HERMES_HOME=/home/hermes/.hermes  # 讓大腦認得這個地址
       - HERMES_UID=${UID:-1000}
       - HERMES_GID=${GID:-1000}
       # Bind-mount permission handling for the agent — narrow set of overrides.
@@ -88,27 +83,14 @@ services:
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
-      # Same hermes home as the agent — shares config, sessions, state
-      - hermes-home:/home/hermeswebui/.hermes
-      # Agent source mounted where docker_init.bash expects it.
-      # At startup the init script runs:
-      #   uv pip install /home/hermeswebui/.hermes/hermes-agent
-      # which installs the agent and all its Python dependencies.
-      - hermes-agent-src:/home/hermeswebui/.hermes/hermes-agent
-      # Workspace directory — browse and edit files from the WebUI.
-      # Adapt the host path to your project directory.
-      # Override with: HERMES_WORKSPACE=/your/path docker compose up
-      - ${HERMES_WORKSPACE:-~/workspace}:/workspace
+      - ${HERMES_HOME:-${HOME}/Hermes_Gion_Core}:/home/hermeswebui/.hermes
+      - ${HERMES_WORKSPACE:-${HOME}/Hermes_Gion_Core/Public_Welfare_Project}:/workspace
     environment:
       - HERMES_WEBUI_HOST=0.0.0.0
       - HERMES_WEBUI_PORT=8787
-      - HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui
-      # Match your host user's UID/GID for correct file permissions.
-      # In two-container setups the WebUI auto-detects UID/GID from the shared
-      # hermes-home volume, but you can override explicitly if needed (#668):
-      # Run `id -u` and `id -g` to find your values.
-      # On macOS, UIDs start at 501 — set these in a .env file:
-      #   echo "UID=$(id -u)" >> .env && echo "GID=$(id -g)" >> .env
+      # 修正：加上那個「點」，確保對齊 volumes 的管子
+      - HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui_history
+      - HERMES_WEBUI_DEFAULT_WORKSPACE=/workspace
       - WANTED_UID=${UID:-1000}
       - WANTED_GID=${GID:-1000}
       # Optional: set a password for remote access
@@ -127,7 +109,3 @@ services:
 networks:
   hermes-net:
     driver: bridge
-
-volumes:
-  hermes-home:
-  hermes-agent-src:
