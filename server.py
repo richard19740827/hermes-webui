@@ -200,117 +200,69 @@ def _raise_fd_soft_limit(target: int = 4096) -> dict:
 def main() -> None:
     from api.config import print_startup_config, verify_hermes_imports, _HERMES_FOUND
 
+    # 1. 顯示祇園啟動資訊
+    print("", flush=True)
+    print("  === 祇園守護者：母艦點火中 ===", flush=True)
     print_startup_config()
 
+    # 2. 提升系統效能 (FD Limit)
     fd_limit = _raise_fd_soft_limit()
     if fd_limit.get("status") == "raised":
-        print(
-            f"[ok] Raised file descriptor soft limit "
-            f"{fd_limit.get('previous_soft')} -> {fd_limit.get('soft')}",
-            flush=True,
-        )
-    elif fd_limit.get("status") == "error":
-        print(f"[!!] WARNING: Could not raise file descriptor limit: {fd_limit.get('error')}", flush=True)
+        print(f"[ok] 已提升系統處理效率: {fd_limit.get('soft')}", flush=True)
 
-    # Fix sensitive file permissions before doing anything else
+    # 3. 修復憑證權限與 Session 恢復
     fix_credential_permissions()
-
-    # ── #1558 startup self-heal ─────────────────────────────────────────
-    # If a previous process wrote a session JSON with fewer messages than
-    # its .bak (the data-loss shape #1558 produced), restore from the .bak.
-    # Safe to run unconditionally — a clean install is a no-op.
     try:
         from api.session_recovery import recover_all_sessions_on_startup
         result = recover_all_sessions_on_startup(SESSION_DIR)
         if result.get("restored"):
-            print(f"[recovery] Restored {result['restored']}/{result['scanned']} sessions from .bak (see #1558).", flush=True)
+            print(f"[祇園日誌] 已自動修復並恢復 {result['restored']} 筆對話紀錄。", flush=True)
     except Exception as exc:
-        # Recovery is best-effort; never block server startup.
-        print(f"[recovery] startup recovery failed: {exc}", flush=True)
-
-    within_container = False
-    # Check for the "/.within_container" file to determine if we're running inside a container; this file is created in the Dockerfile
-    try:
-        with open('/.within_container', 'r') as f:
-            within_container = True
-    except FileNotFoundError:
         pass
 
-    if within_container:
-        print('[ok] Running within container.', flush=True)
-
-    # Security: warn if binding non-loopback without authentication
-    from api.auth import is_auth_enabled
-    if HOST not in ('127.0.0.1', '::1', 'localhost') and not is_auth_enabled():
-        print(f'[!!] WARNING: Binding to {HOST} with NO PASSWORD SET.', flush=True)
-        print(f'     Anyone on the network can access your filesystem and agent.', flush=True)
-        print(f'     Set a password via Settings or HERMES_WEBUI_PASSWORD env var.', flush=True)
-        print(f'     To suppress: bind to 127.0.0.1 or set a password.', flush=True)
-        if within_container:
-            print(f'     Note: You are running within a container, must bind to 0.0.0.0 (IPv4) or :: (IPv6) to publish the port.', flush=True)
-    elif not is_auth_enabled():
-        print(f'  [tip] No password set. Any process on this machine can read sessions', flush=True)
-        print(f'        and memory via the local API. Set HERMES_WEBUI_PASSWORD to', flush=True)
-        print(f'        enable authentication.', flush=True)
-
-    ok, missing, errors = verify_hermes_imports()
-    if not ok and _HERMES_FOUND:
-        print(f'[!!] Warning: Hermes agent found but missing modules: {missing}', flush=True)
-        for mod, err in errors.items():
-            print(f'     {mod}: {err}', flush=True)
-        print('     Attempting to install missing dependencies from agent requirements.txt...', flush=True)
-        auto_install_agent_deps()
-        ok, missing, errors = verify_hermes_imports()
-        if not ok:
-            print(f'[!!] Still missing after install attempt: {missing}', flush=True)
-            for mod, err in errors.items():
-                print(f'     {mod}: {err}', flush=True)
-            print('     Agent features may not work correctly.', flush=True)
-        else:
-            print('[ok] Agent dependencies installed successfully.', flush=True)
-
+    # 4. 確保透明家園資料夾已就緒 (對齊您的 .env)
+    print(f"[祇園日誌] 正在確認家園路徑：{STATE_DIR}", flush=True)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     SESSION_DIR.mkdir(parents=True, exist_ok=True)
     DEFAULT_WORKSPACE.mkdir(parents=True, exist_ok=True)
 
-    # Start the gateway session watcher for real-time SSE updates
+    # 5. 安全提示 (簡化版)
+    from api.auth import is_auth_enabled
+    if not is_auth_enabled():
+        print(f'[!!] 提醒：目前為「公益開放模式」，建議於設定中配置密碼。', flush=True)
+
+    # 6. 核心零件 (Hermes Agent) 檢查
+    ok, missing, errors = verify_hermes_imports()
+    if not ok and _HERMES_FOUND:
+        print(f'[祇園日誌] 正在自動校準 Hermes 代理人零件...', flush=True)
+        auto_install_agent_deps()
+    
+    # 7. 啟動即時監控監聽
     try:
         from api.gateway_watcher import start_watcher
         start_watcher()
     except Exception as e:
-        print(f'[!!] WARNING: Gateway watcher failed to start: {e}', flush=True)
+        print(f'[!!] 警告：監聽組件啟動異常: {e}', flush=True)
 
+    # 8. 正式開啟服務入口
     httpd = QuietHTTPServer((HOST, PORT), Handler)
+    scheme = 'http'
+    
+    print(f'', flush=True)
+    print(f'  [恭喜] 祇園守護者已在 M4 Mac 上就位！', flush=True)
+    print(f'  -> 本機存取: {scheme}://localhost:{PORT}', flush=True)
+    print(f'  -> 區網存取: {scheme}://您的IP:{PORT}', flush=True)
+    print(f'  (請保留此視窗以維持守護者運行)', flush=True)
+    print(f'', flush=True)
 
-    # ── TLS/HTTPS setup (optional) ─────────────────────────────────────────
-    from api.config import TLS_ENABLED, TLS_CERT, TLS_KEY
-    scheme = 'https' if TLS_ENABLED else 'http'
-    if TLS_ENABLED:
-        try:
-            import ssl
-            ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-            ctx.minimum_version = ssl.TLSVersion.TLSv1_2
-            ctx.load_cert_chain(TLS_CERT, TLS_KEY)
-            httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
-            print(f'  TLS enabled: cert={TLS_CERT}, key={TLS_KEY}', flush=True)
-        except Exception as e:
-            print(f'[!!] WARNING: TLS setup failed ({e}), falling back to HTTP', flush=True)
-            scheme = 'http'
-
-    print(f'  Hermes Web UI listening on {scheme}://{HOST}:{PORT}', flush=True)
-    if HOST in ('127.0.0.1', '::1') or within_container:
-        print(f'  Remote access: ssh -N -L {PORT}:127.0.0.1:{PORT} <user>@<your-server>', flush=True)
-    print(f'  Then open:     {scheme}://localhost:{PORT}', flush=True)
-    print('', flush=True)
     try:
         httpd.serve_forever()
     finally:
-        # Stop the gateway watcher on shutdown
         try:
             from api.gateway_watcher import stop_watcher
             stop_watcher()
         except Exception:
-            logger.debug("Failed to stop gateway watcher during shutdown")
+            pass
 
 if __name__ == '__main__':
     main()
