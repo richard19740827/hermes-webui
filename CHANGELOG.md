@@ -1,5 +1,60 @@
 # Hermes Web UI -- Changelog
 
+## [v0.1.0-governed] — 2026-05-10 — 第一個可治理、可驗證、可 rollback 的 canonical main branch
+
+### 發布目的
+
+這個 release 是治理基線，不是功能擴張。目標是把目前 main branch 整理成單人本地可長期維護的狀態：安裝來源唯一、驗證方式明確、runtime smoke 可執行、rollback 可預期，並且 archive boundary 清楚。
+
+### 新增
+
+- `scripts/validate.sh`：本機 governance gate。檢查 clean git tree、必要命令、Python syntax、canonical compose render、duplicate env、placeholder password、root compose variants，以及 `start.sh` / `ctl.sh` 是否透過 `bootstrap.py`。
+- `scripts/smoke.sh`：本機 runtime gate。使用 temporary `HERMES_HOME`、temporary `HERMES_WORKSPACE` 與 unique `COMPOSE_PROJECT_NAME` 啟動 root `docker-compose.yml`，驗證 container、`/health`、canonical state dir、workspace mount、logs，最後執行 rollback 並確認沒有 orphan containers。
+- `archive/README.md` 與 `archive/docker/README.md`：明確標示 archive 只作 historical reference，not supported，not install source。
+
+### 變更
+
+- `README.md`：install flow 收斂為 root `docker-compose.yml` 的 single-container canonical Docker flow，並以繁體中文描述單人本地治理方式。
+- `docs/docker.md`：改為繁體中文 canonical Docker 文件，只保留 single-container flow、macOS UID/GID、local Docker + Ollama、rollback、validate/smoke 說明。
+- `docker-compose.yml`：維持 root 唯一 canonical compose，預設 publish 到 `127.0.0.1:8787`，使用 `/home/hermeswebui/.hermes/webui_history` 作 canonical state path，並移除 duplicate env 與 placeholder password。
+- `start.sh`：收斂為 thin wrapper，只找 repo root、找 Python，然後 `exec bootstrap.py --foreground`，讓 `bootstrap.py` 成為啟動核心。
+
+### 歸檔
+
+- `archive/docker/docker-compose.two-container.yml`
+- `archive/docker/docker-compose.three-container.yml`
+
+這些檔案只保留舊 multi-container 實驗與 migration 歷史；它們不支援、不作 install source，也不納入 canonical runtime smoke。
+
+### 正式 deprecated
+
+- root-level compose variants 作為 install source。
+- two-container / three-container compose variants 作為 supported main branch install flow。
+- `start.sh` 直接執行 `server.py`。
+- 依 venv 是否存在來切換啟動模式。
+- 把 `server.py` 當作正式 install entrypoint；它只保留為 manual repair / debug path。
+
+### 本機驗證 checklist
+
+```bash
+./scripts/validate.sh
+./scripts/smoke.sh
+curl http://127.0.0.1:8787/health
+docker compose down --volumes --remove-orphans
+```
+
+### 仍保留的 technical debt
+
+- `server.py` 仍可直接執行，但定位為 manual repair / debug，不是正式 install flow。
+- `ctl.sh` 仍保留 daemon-style PID/log/status 管理；本 release 不改它的啟動模型。
+- `scripts/smoke.sh` 需要本機 Docker Compose 與可用的 Docker daemon；沒有 Docker 的環境只能執行語法檢查。
+- `scripts/smoke.sh` 為了不新增 dependency，使用 shell pattern 驗證 `/health` response，而不是引入 JSON parser。
+
+### release discipline
+
+release 後的 main branch governance 原則：root 只保留 `docker-compose.yml`；archive 不是 install source；runtime 變更需跑 `scripts/smoke.sh`；repo / compose / startup wrapper 變更需跑 `scripts/validate.sh`；rollback 指令固定使用 `docker compose down --volumes --remove-orphans`。
+
+
 ## [v0.51.30] — 2026-05-08 — 3-PR contributor batch (Release G: offline recovery + PWA hardening + opt-in session jump buttons + opt-in endless-scroll)
 
 ### Added (3 PRs, all from @ai-ag2026)

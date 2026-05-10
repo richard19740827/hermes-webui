@@ -11,17 +11,17 @@
 - **右側欄**：工作區檔案瀏覽，讓您隨時查看 AI 處理的檔案。
 所有的模型切換與工作區控制都在下方的**「輸入框頁尾」**，讓您在打字時一目了然。
 
-<img width="2448" height="1748" alt="Hermes Web UI — three-panel layout" src="https://github.com/user-attachments/assets/6bf8af4c-209d-441e-8b92-6515d7a0c369" />
+<img width="2448" height="1748" alt="Hermes WebUI 三欄式介面" src="https://github.com/user-attachments/assets/6bf8af4c-209d-441e-8b92-6515d7a0c369" />
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img width="2940" height="1848" alt="Light mode with full profile support" src="https://github.com/user-attachments/assets/4ef3a59c-7a66-4705-b4e7-cb9148fe4c47" />
-      <br /><sub>Light mode with full profile support</sub>
+      <img width="2940" height="1848" alt="支援完整 profile 的淺色模式" src="https://github.com/user-attachments/assets/4ef3a59c-7a66-4705-b4e7-cb9148fe4c47" />
+      <br /><sub>支援完整 profile 的淺色模式</sub>
     </td>
     <td width="50%" align="center">
-      <img alt="Customize your settings, configure a password" src="https://github.com/user-attachments/assets/941f3156-21e3-41fd-bcc8-f975d5000cb8" />
-      <br /><sub>Customize your settings, configure a password</sub>
+      <img alt="自訂設定並配置密碼" src="https://github.com/user-attachments/assets/941f3156-21e3-41fd-bcc8-f975d5000cb8" />
+      <br /><sub>自訂設定並配置密碼</sub>
     </td>
   </tr>
 </table>
@@ -29,17 +29,17 @@
 <table>
   <tr>
     <td width="50%" align="center">
-      <img alt="Workspace file browser with inline preview" src="docs/images/ui-workspace.png" />
-      <br /><sub>Workspace file browser with inline preview</sub>
+      <img alt="含 inline preview 的工作區檔案瀏覽器" src="docs/images/ui-workspace.png" />
+      <br /><sub>含 inline preview 的工作區檔案瀏覽器</sub>
     </td>
     <td width="50%" align="center">
-      <img alt="Session projects, tags, and tool call cards" src="docs/images/ui-sessions.png" />
-      <br /><sub>Session projects, tags, and tool call cards</sub>
+      <img alt="Session 專案、標籤與 tool call 卡片" src="docs/images/ui-sessions.png" />
+      <br /><sub>Session 專案、標籤與 tool call 卡片</sub>
     </td>
   </tr>
 </table>
 
-This gives you nearly **1:1 parity with Hermes CLI from a convenient web UI** which you can access securely through an SSH tunnel from your Hermes setup. Single command to start this up, and a single command to SSH tunnel for access on your computer. Every single part of the web UI uses your existing Hermes agent and existing models, without requiring any additional setup.
+這個 WebUI 目標是讓您在瀏覽器中取得接近 **Hermes CLI 1:1 的操作能力**，但仍保留本地工作站的可理解性與可手動修復性。它使用您既有的 Hermes agent、模型設定與本機資料，不把安裝流程包裝成雲端服務。
 
 ---
 
@@ -69,80 +69,77 @@ This gives you nearly **1:1 parity with Hermes CLI from a convenient web UI** wh
 | **自我改進技能** | ❌ 無 | ❌ 無 | ✅ **具備** |
 | **數據自主權** | ❌ 存於雲端 | ✅ 存於本地 | ✅ **存於本地** |
 
-## 完整安裝 (Mac 本地專屬)
+## canonical 安裝流程（main branch）
 
-### 第一步：打開 Mac 的「終端機 (Terminal)」，完整複製並貼上指令：
+main branch 只支援一個正式 install source：root 的 single-container `docker-compose.yml`。
+這是給單人、本地、長期維護使用的 Docker flow；目標是可安裝、可驗證、可 rollback，而不是增加新的 Docker 架構。
+
+### 1. clone repo
 
 ```bash
 git clone https://github.com/richard19740827/hermes-webui.git
 cd hermes-webui
-python3 bootstrap.py
 ```
 
-### 第二步：未來的日常啟動
-當您完成第一次安裝後，未來每天想呼叫 AI 教授時，只需要進入資料夾並按下啟動開關：
+### 2. 建立本地 Docker 設定
 
 ```bash
-cd hermes-webui
-./start.sh
+cp .env.docker.example .env
 ```
 
-(啟動後，只要不關閉這個黑視窗，您的 AI 守護者就會持續在背景為您服務。)
-
-###  自動引導程序將為您完成：
-1. **自動偵測**：檢查您的 M4 Mac 是否已安裝 Hermes 代理人。
-2. **環境建置**：自動準備好 Python 執行環境，您不需要手動安裝零件。
-3. **健康檢查**：啟動網頁伺服器並確保運作正常。
-4. **自動導航**：完成後自動幫您打開瀏覽器，進入「新手引導教學」。
-
----
-
-##  自動偵測機制 (start.sh)
-
-守護者的啟動腳本非常聰明，它會自動尋找以下零件：
-- **大腦路徑**：自動尋找您的 `~/Hermes_Gion_Core/hermes-agent` 資料夾。
-- **執行引擎**：自動定位 Python 的位置。
-- **記憶目錄**：預設已鎖定為 `~/Hermes_Gion_Core/webui_history`。
-
----
-
-## 環境開關 (Overrides)
-
-如果您有特殊需求（例如想換個連接埠），可以在啟動時手動輸入開關：
-- `HERMES_WEBUI_PORT=9000`：把網頁大門改到 9000 號。
-- `HERMES_WEBUI_BOT_NAME`：為您的 AI 助手取個響亮的名字。
-
----
-
-## 如何連線存取守護者？
-
-根據您的所在位置，有三種簡單的存取方式：
-
-### 1. 在本地主機 (Mac) 直接使用 (最推薦)
-啟動後，在瀏覽器輸入 `http://localhost:8787` 即可開始對話。
-
-### 2. 在區域網路使用：如手機/平板
-只要行動裝置與主機連接相同 Wi-Fi，在行動裝置瀏覽器輸入主機的區網 IP (如 `http://192.168.x.x:8787`) 即可。
-*(提示：本系統已預設開啟區域網路共享，您無需額外設定指令。)*
-
-### 3. 出門在外遠端存取 (免 VPN 方案)
-若您人在戶外，建議透過您的 **群暉 (Synology) NAS** 設定「反向代理」：
-- **操作路徑**：群暉控制面板 > 登錄門戶 > 進階 > 反向代理伺服器。
-- **優點**：全中文設定，支援 HTTPS 加密連線，手機無需安裝任何軟體。
-- **核心設定**：將來源 `HTTPS:443` 轉接至目的端（Mac 主機）的 `HTTP:8787`，**請務必在「自訂標頭」中開啟 WebSocket 支援。**
-
----
-
-## 手動啟動 (進階檢修)
-
-如果您在啟動過程中遇到問題，或是想查看詳細的後台日誌，可以使用手動模式：
+在 macOS 上，請打開 `.env`，把 `UID` / `GID` 設成您目前使用者的值，避免 bind mount 後 container 無法讀寫檔案：
 
 ```bash
-# 進入透明路徑中的大腦目錄
-cd ~/Hermes_Gion_Core/hermes-agent
+id -u
+id -g
+```
 
-# 使用透明路徑中的環境與路徑啟動伺服器
-~/Hermes_Gion_Core/hermes-agent/venv/bin/python ~/Hermes_Gion_Core/hermes-webui/server.py
+canonical compose 會把您的本機 Hermes home 與 workspace 掛進同一個 container：
+
+- `${HERMES_HOME:-${HOME}/Hermes_Gion_Core}` → `/home/hermeswebui/.hermes`
+- `${HERMES_WORKSPACE:-${HOME}/Hermes_Gion_Core/Public_Welfare_Project}` → `/workspace`
+
+### 3. 啟動 WebUI
+
+```bash
+docker compose up -d
+```
+
+打開 <http://localhost:8787>。root `docker-compose.yml` 預設只 publish 到 `127.0.0.1:8787`，適合單人本機使用。
+
+### 4. 驗證健康狀態
+
+```bash
+curl http://127.0.0.1:8787/health
+```
+
+WebUI ready 後，health endpoint 應回報 `status` 為 `ok`。
+
+### 5. 停止與 rollback
+
+一般停止：
+
+```bash
+docker compose down
+```
+
+若要清掉 Docker 建立的 volumes 與 orphan containers，使用乾淨 rollback：
+
+```bash
+docker compose down --volumes --remove-orphans
+```
+
+---
+
+## Docker 治理原則
+
+- root 只保留一個正式 compose file：`docker-compose.yml`。
+- two-container / three-container compose files 已移到 `archive/docker/`，只作 historical reference。
+- `archive/` 不是 install source；裡面的檔案不支援、不保證可運作，也不作 main branch 驗證來源。
+- 本地 Docker + Ollama 情境下，Ollama 留在 host；Hermes 設定透過 mounted `HERMES_HOME` 提供給 WebUI。
+- `scripts/validate.sh` 是治理檢查；`scripts/smoke.sh` 是 canonical Docker runtime smoke test。
+
+---
 
 ## 核心功能 (Features)
 
