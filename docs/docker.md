@@ -1,220 +1,128 @@
-# Hermes WebUI — Docker setup guide
+# Hermes WebUI — canonical Docker 設定
 
-This is the comprehensive Docker reference. For a 5-minute quickstart, see the [README Docker section](../README.md#docker).
+main branch 只有一個支援的 Docker install source：root 的 `docker-compose.yml`。
+這是 single-container、單人本地使用的 canonical flow。文件目標是可理解、可回溯、可手動修復、可 rollback，而不是建立新的 Docker 架構。
 
-## TL;DR — pick one
+`archive/docker/` 內的 two-container / three-container Compose files 只作 historical reference。它們不支援、不作 install source，也不應用於 main branch 安裝。
 
-| Setup | When to use | File |
-|---|---|---|
-| **Single-container** (recommended) | You just want chat working. WebUI runs the agent in-process. | `docker-compose.yml` |
-| **Two-container** | You want isolation between gateway (CLI/Telegram/cron) and chat UI. | `docker-compose.two-container.yml` |
-| **Three-container** | Two-container PLUS the dashboard for monitoring. | `docker-compose.three-container.yml` |
-| **All-in-one image** (community fork — third-party, not maintained by us) | Podman 3.4 / multi-arch / supervisord-style preference. | [sunnysktsang/hermes-suite](https://github.com/sunnysktsang/hermes-suite) — see [#1399](https://github.com/nesquena/hermes-webui/issues/1399) for the original discussion |
-
-If something stops working, **start with the single-container setup** — it's the simplest path and fixes most permission/UID/path-mismatch issues by construction.
-
-## Production image security model
-
-The production Docker image is hardened for the normal single-tenant container threat model:
-Hermes WebUI assumes one operator controls the container, mounted Hermes home, and workspace.
-The image does **not** install `sudo`, does not add runtime users to a sudo group, and does not
-grant `NOPASSWD` escalation. If an agent/tool process gains a shell as `hermeswebui`, it should
-not be able to become root with a passwordless sudo command.
-
-The entrypoint still starts as `root` for a narrow init phase because Docker bind mounts often need
-UID/GID alignment and ownership preparation before the app can read `~/.hermes`, `/workspace`,
-`/app`, and `/uv_cache`. After that setup, `docker_init.bash` re-execs itself as the unprivileged
-`hermeswebui` user and starts the server there. Init scratch files under `/tmp/hermeswebui_init`
-are owner-only (`0700` directory, `0600` files), not world-writable.
-
-For multi-tenant or hostile-container environments, rebuild with your own runtime user, mount policy,
-and supervisor assumptions. Development images that need package-manager convenience should add
-those tools in a dev-only Dockerfile instead of reintroducing passwordless sudo to production.
-
-## 5-minute quickstart (single container)
+## 5 分鐘 quickstart
 
 ```bash
-git clone https://github.com/nesquena/hermes-webui
+git clone https://github.com/richard19740827/hermes-webui.git
 cd hermes-webui
 cp .env.docker.example .env
-# Edit .env if needed (most users can skip this on Linux)
+# macOS 請編輯 .env，設定 UID=$(id -u) 與 GID=$(id -g)
 docker compose up -d
 open http://localhost:8787
 ```
 
-That's it. Your existing `~/.hermes` directory is mounted, your `~/workspace` is browsable, and the WebUI auto-detects your UID/GID from the mounted volume.
+canonical compose file 會把 WebUI publish 到 `127.0.0.1:8787`，預設只供本機使用。container 內部仍使用 `0.0.0.0:8787`，讓 Docker port forwarding 正常運作。
 
-## What goes wrong (and how to fix it)
+## canonical compose file
 
-### 1. "Permission denied" at startup
+只使用：
 
-**Symptom**: Container starts but immediately crashes, logs show:
+- [`../docker-compose.yml`](../docker-compose.yml) — single-container canonical Docker Compose file
+
+不要把 archived Compose variants 當成 install source。它們只保留作歷史參考：
+
+- [`../archive/docker/docker-compose.two-container.yml`](../archive/docker/docker-compose.two-container.yml)
+- [`../archive/docker/docker-compose.three-container.yml`](../archive/docker/docker-compose.three-container.yml)
+
+## 本機路徑
+
+canonical compose file 使用這些預設值：
+
+| Host path | Container path | 用途 |
+|---|---|---|
+| `${HERMES_HOME:-${HOME}/Hermes_Gion_Core}` | `/home/hermeswebui/.hermes` | Hermes config、sessions、credentials、WebUI state |
+| `${HERMES_WORKSPACE:-${HOME}/Hermes_Gion_Core/Public_Welfare_Project}` | `/workspace` | WebUI 內看到的 workspace |
+
+container 內的 canonical WebUI state path 是：
+
+```text
+/home/hermeswebui/.hermes/webui_history
 ```
-PermissionError: [Errno 13] Permission denied: '/home/hermeswebui/.hermes/...'
+
+因為 `/home/hermeswebui/.hermes` 來自 `HERMES_HOME` bind mount，所以 host 上對應：
+
+```text
+${HERMES_HOME:-${HOME}/Hermes_Gion_Core}/webui_history
 ```
 
-**Cause**: The container's user (UID 1000 by default) can't read your bind-mounted directory because your host files are owned by a different UID.
+## macOS UID/GID 設定
 
-**Fix**: Set `UID` and `GID` in `.env` to match your host:
+macOS 使用既有 Hermes home 做 bind mount 時，請在 `.env` 中設定 `UID` 與 `GID`，讓 container 使用與 host 相同的使用者身份讀寫檔案：
+
 ```bash
 echo "UID=$(id -u)" >> .env
 echo "GID=$(id -g)" >> .env
 docker compose down && docker compose up -d
 ```
 
-On macOS, host UIDs start at 501. On Linux, the first interactive user is usually UID 1000.
+macOS 的 UID 常見從 `501` 開始；Linux 第一個互動使用者常見是 `1000`。請以 `id -u` / `id -g` 的實際輸出為準。
 
-> **macOS Docker Desktop**: if UID mapping still misbehaves after the env fix, try toggling **Settings → General → File sharing implementation** between VirtioFS and gRPC-FUSE. Different implementations preserve UIDs across the host/container boundary differently.
+## 本地 Docker + Ollama
 
-### 2. ".env file mode 0640 → permission denied" (#1389)
+本地 Docker + Ollama 情境下，Ollama 留在 host 執行；Hermes 的設定、credentials 與狀態放在 mounted `HERMES_HOME`。這個 repo 仍只支援一個 WebUI container。
 
-**Symptom**: You set `HERMES_HOME_MODE=0640` (or some other group-readable mode) on your host `.env` file, container starts, then errors out:
-```
-[security] fixed permissions on .env (0o640 -> 0600)
-failed to load .env: open .env: permission denied
-```
+## 安全提醒
 
-**Cause**: WebUI's `fix_credential_permissions()` startup hook enforces 0600 by default. This is the right thing for a clean install but conflicts with operator-set modes.
+canonical compose file 預設只 expose localhost。如果您刻意把 WebUI 暴露到 `127.0.0.1` 以外，請先在 `.env` 設定強密碼 `HERMES_WEBUI_PASSWORD`。
 
-**Fix**: Set one of these env vars in your `.env`:
-- `HERMES_SKIP_CHMOD=1` — bypass the fixer entirely
-- `HERMES_HOME_MODE=0640` — allow group bits, only strip world-readable
+Docker image 以單人本地 container threat model 設計。啟動時只在狹窄的 bind-mount 準備階段使用 root，之後以非特權 runtime user 執行 WebUI；不要把它當成多租戶雲端服務邊界。
 
-Both are documented in `api/startup.py::fix_credential_permissions()`.
+## 常見手動修復
 
-> ⚠️ **Multi-container warning**: `HERMES_HOME_MODE` has DIFFERENT semantics in the agent image vs. the WebUI:
-> - **WebUI**: credential FILE mode threshold (`0640` allows group bits on `.env`)
-> - **Agent**: `HERMES_HOME` *directory* mode (default `0700`)
->
-> `0640` on a directory has no owner-execute bit, so the agent can't traverse its own home → bricked. For multi-container setups, use `HERMES_HOME_MODE=0750` (group-traversable) or `0701` (x-only). The compose files have per-service comments that match each side's semantics.
+### 啟動時 Permission denied
 
-### 3. "Workspace appears empty even though my files are there"
+如果 container 啟動後在 `/home/hermeswebui/.hermes` 出現 permission error，通常是 host 檔案 owner 與 container UID/GID 不一致。請設定 `.env` 後重啟：
 
-**Symptom**: WebUI loads but `/workspace` shows no files.
-
-**Cause**: Same as #1 — UID mismatch on the bind mount.
-
-**Fix**: Same as #1 — match host UID/GID via `.env`.
-
-### 4. "Two-container setup: WebUI can't find agent source" (#858)
-
-**Symptom**: WebUI logs at startup:
-```
-!! WARNING: hermes-agent source not found.
-!!   Looked in: /home/hermeswebui/.hermes/hermes-agent
-!!              /opt/hermes
+```bash
+echo "UID=$(id -u)" >> .env
+echo "GID=$(id -g)" >> .env
+docker compose down && docker compose up -d
 ```
 
-**Cause**: The agent's source (`/opt/hermes` inside the agent container) needs to be exposed to the WebUI container via a shared volume. The two-container compose file does this via `hermes-agent-src` named volume, but if you're using bind mounts incorrectly the path won't resolve.
+### WebUI health check
 
-**Fix**: Use the named volumes that ship with `docker-compose.two-container.yml` — don't replace them with bind mounts unless you know what you're doing. The agent container writes its source to `/opt/hermes`, and the WebUI mounts that volume at `/home/hermeswebui/.hermes/hermes-agent`.
-
-If you must use a bind mount: pick a host path, then mount it to `/opt/hermes` in the agent container AND `/home/hermeswebui/.hermes/hermes-agent` in the WebUI container.
-
-### 5. "Tools (git, node, etc.) missing in two-container setup" (#681)
-
-**Symptom**: You ask the agent to run `git status` in chat and it errors with `command not found`.
-
-**Cause**: This is **architectural, not a bug**. In the two-container setup, agent processes started by the WebUI run **inside the WebUI container**, not the agent container. The WebUI image doesn't include git/node by design (it's a UI image, not a tool host).
-
-**Workarounds**:
-- **Single-container setup** (`docker-compose.yml`) — everything in one container, no boundary
-- **Custom WebUI image** — extend the `Dockerfile` to install the tools you need
-- **Combined image** ([sunnysktsang/hermes-suite](https://github.com/sunnysktsang/hermes-suite)) — community fork that ships agent+webui+dashboard in one container
-
-### 6. "config.yaml not loaded"
-
-**Symptom**: You have a `config.yaml` in your host `~/.hermes/`, but the WebUI shows "no model configured" or doesn't pick up your custom providers.
-
-**Cause**: Either the file isn't readable (UID/GID issue, see #1) or it's not in the expected path inside the container.
-
-**Fix**:
-- Verify: `docker exec hermes-webui ls -la /home/hermeswebui/.hermes/config.yaml`
-- If it doesn't exist: your host bind mount is pointing at the wrong directory.
-- If it exists but is unreadable: see #1 for the UID/GID fix.
-
-### 7. "On Podman: can't share .hermes between containers"
-
-**Symptom**: Two-container setup works on Docker but fails on Podman with permission errors no matter what UID/GID you set.
-
-**Cause**: Podman 3.4 (Ubuntu 22.04 default) has limited support for `userns_mode: keep-id` across multiple containers — files written by one container appear with a different UID in the other.
-
-**Fix**: Either upgrade to Podman 4+ (which fixes this), or use the [single-container setup](#5-minute-quickstart-single-container), or use the [community all-in-one image](https://github.com/sunnysktsang/hermes-suite).
-
-## Multi-container architecture
-
-The two- and three-container setups use **named Docker volumes** (not bind mounts) by default for a reason: named volumes solve the UID/GID problem by construction. Docker creates the volume's root directory with the correct ownership, all containers reading/writing to it see the same files, no host-side permission setup required.
-
-```
-                 ┌─────────────────────────────────┐
-                 │      hermes-home (volume)       │
-                 │  (config, sessions, state, ...)  │
-                 └─────────────────────────────────┘
-                          ↑              ↑
-                          │ rw           │ rw
-                          │              │
-      ┌──────────────┐    │              │    ┌──────────────┐
-      │ hermes-agent │────┘              └────│ hermes-webui │
-      │  (port 8642) │                        │  (port 8787) │
-      └──────────────┘                        └──────────────┘
-              │                                       ↑
-              │ rw                                    │ ro
-              ↓                                       │
-      ┌─────────────────────────┐                     │
-      │ hermes-agent-src (vol)  │─────────────────────┘
-      │ (agent's Python source) │
-      └─────────────────────────┘
+```bash
+curl http://127.0.0.1:8787/health
 ```
 
-The WebUI container doesn't ship with the agent's Python deps — at startup it runs `uv pip install /home/hermeswebui/.hermes/hermes-agent` to install them from the shared volume.
+WebUI ready 後應回報 `status` 為 `ok`。
 
-## Bind-mount migration (advanced)
+### 查看 logs
 
-If you really need to bind-mount an existing host `~/.hermes` (e.g. you're keeping config in dotfiles, sharing with a non-Docker `hermes` install, etc.):
-
-```yaml
-volumes:
-  hermes-home:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/youruser/.hermes
-  hermes-agent-src:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /opt/hermes-agent-source
+```bash
+docker compose logs --tail=200 hermes-webui
 ```
 
-**Critical requirements**:
+### 乾淨 rollback
 
-1. The host directory MUST be readable by your container UID. Run `id -u` on the host and ensure `~/.hermes` is owned by that UID (or readable via group bits).
-2. ALL containers sharing the volume must run as the SAME UID/GID. Set `UID=$(id -u)` and `GID=$(id -g)` in `.env`.
-3. If your host `.env` is mode 0640, set `HERMES_SKIP_CHMOD=1` or `HERMES_HOME_MODE=0640` so the startup hook doesn't try to enforce 0600.
+```bash
+docker compose down --volumes --remove-orphans
+```
 
-## Reference
+## 本地治理檢查
 
-- [`docker-compose.yml`](../docker-compose.yml) — single container (recommended)
-- [`docker-compose.two-container.yml`](../docker-compose.two-container.yml) — agent + webui
-- [`docker-compose.three-container.yml`](../docker-compose.three-container.yml) — agent + dashboard + webui
-- [`.env.docker.example`](../.env.docker.example) — environment variable template
-- [`Dockerfile`](../Dockerfile) — single-container build
-- [`docker_init.bash`](../docker_init.bash) — container entrypoint script
+repo 提供兩個本機腳本，方便單人長期維護：
 
-## Related issues
+```bash
+./scripts/validate.sh
+./scripts/smoke.sh
+```
 
-- #1389 — `HERMES_HOME_MODE` override (fixed in v0.50.254 — agent honors `HERMES_SKIP_CHMOD` and `HERMES_HOME_MODE`)
-- #1399 — UID alignment in compose files (fixed in v0.50.260 via PR #1428 + this guide)
-- #858 — two-container `/opt/hermes` path confusion
-- #681 — tools running in WebUI container, not agent container (architectural)
-- #668 — auto-detect UID/GID from mounted volume
-- #569 — UID/GID detection priority order
+- `scripts/validate.sh`：檢查 repo governance、Python syntax、canonical compose render、root 是否只有 canonical compose、startup wrapper 是否走 `bootstrap.py`。
+- `scripts/smoke.sh`：用 temporary `HERMES_HOME`、temporary `HERMES_WORKSPACE`、unique `COMPOSE_PROJECT_NAME` 啟動 canonical Docker runtime，驗證 `/health`、state dir、workspace mount、logs，最後 rollback 並確認沒有 orphan containers。
 
-If you hit a new failure mode not covered here, please [open an issue](https://github.com/nesquena/hermes-webui/issues/new) with:
+## archive policy
 
-1. Which compose file you used
-2. The error from `docker logs hermes-webui`
-3. `docker exec hermes-webui id` output
-4. `docker exec hermes-webui ls -la /home/hermeswebui/.hermes` output
+`archive/` 不是 install source。
+
+- 只作 historical reference
+- not supported
+- 不屬於 main branch canonical flow
+- 不保證能與目前 runtime 行為相容
+
+詳見 [`../archive/README.md`](../archive/README.md)。
